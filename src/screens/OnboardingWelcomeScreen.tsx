@@ -1,12 +1,57 @@
-import React from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Sparkles } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
+import { authClient } from "@/lib/authClient";
+import { api } from "@/lib/api";
 
 type Props = RootStackScreenProps<"OnboardingWelcome">;
 
 const OnboardingWelcomeScreen = ({ navigation }: Props) => {
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkAuthStatus() {
+      try {
+        const session = await authClient.getSession();
+
+        if (session?.data?.user) {
+          // User is logged in, check if they have a companion
+          try {
+            await api.get("/api/companion");
+            // Has companion, navigate to tabs
+            navigation.replace("Tabs");
+            return;
+          } catch (error) {
+            // No companion, stay on welcome screen
+          }
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+      } finally {
+        setIsChecking(false);
+      }
+    }
+
+    checkAuthStatus();
+  }, [navigation]);
+
+  if (isChecking) {
+    return (
+      <View style={{ flex: 1 }}>
+        <LinearGradient
+          colors={["#8B5CF6", "#EC4899"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </LinearGradient>
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
