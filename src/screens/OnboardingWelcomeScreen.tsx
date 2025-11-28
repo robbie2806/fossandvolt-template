@@ -11,6 +11,7 @@ type Props = RootStackScreenProps<"OnboardingWelcome">;
 
 const OnboardingWelcomeScreen = ({ navigation }: Props) => {
   const [isChecking, setIsChecking] = useState(true);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -70,6 +71,38 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
     );
   }
 
+  const handleStart = async () => {
+    setIsCreatingAccount(true);
+    try {
+      // Check if already logged in
+      const session = await authClient.getSession();
+      if (session?.data?.user) {
+        // Already logged in, proceed to name screen
+        navigation.navigate("OnboardingName");
+        return;
+      }
+
+      // Create anonymous account
+      const uniqueId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const email = `${uniqueId}@bondnode.app`;
+      const password = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+
+      await authClient.signUp.email({
+        email,
+        password,
+        name: "Guest",
+      });
+
+      // Navigate to name screen
+      navigation.navigate("OnboardingName");
+    } catch (error) {
+      console.error("Failed to create account:", error);
+      alert("Failed to start. Please try again.");
+    } finally {
+      setIsCreatingAccount(false);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
@@ -96,11 +129,16 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
 
           {/* Start Button */}
           <Pressable
-            onPress={() => navigation.navigate("OnboardingName")}
-            className="bg-white rounded-2xl px-12 py-4 shadow-lg active:scale-95"
+            onPress={handleStart}
+            disabled={isCreatingAccount}
+            className={`rounded-2xl px-12 py-4 shadow-lg ${isCreatingAccount ? "bg-white/30" : "bg-white active:scale-95"}`}
             style={{ transform: [{ scale: 1 }] }}
           >
-            <Text className="text-purple-600 text-xl font-semibold">Start</Text>
+            {isCreatingAccount ? (
+              <ActivityIndicator color="#8B5CF6" />
+            ) : (
+              <Text className="text-purple-600 text-xl font-semibold">Start</Text>
+            )}
           </Pressable>
 
           {/* Legal text */}
