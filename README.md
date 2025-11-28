@@ -197,6 +197,14 @@ The AI does not have emotions or feelings. It's a tool designed to be supportive
 - A trusted professional
 - A mental health hotline
 
+## Recent Changes
+
+### Database Migration Applied (Nov 28, 2025)
+- Applied pending database migration `20251128011254_add_bondnode_models`
+- Created all necessary tables: `ai_companion`, `chat_message`, `daily_check_in`, `bond_action`, `user_settings`
+- Fixed "table does not exist" error when creating AI companion during onboarding
+- All backend API endpoints are now fully functional
+
 ## Development
 
 ### Key Files
