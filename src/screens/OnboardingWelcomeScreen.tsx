@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Sparkles } from "lucide-react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { authClient } from "@/lib/authClient";
 import { api } from "@/lib/api";
@@ -11,31 +12,48 @@ type Props = RootStackScreenProps<"OnboardingWelcome">;
 const OnboardingWelcomeScreen = ({ navigation }: Props) => {
   const [isChecking, setIsChecking] = useState(true);
 
-  useEffect(() => {
-    async function checkAuthStatus() {
-      try {
-        const session = await authClient.getSession();
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
 
-        if (session?.data?.user) {
-          // User is logged in, check if they have a companion
-          try {
-            await api.get("/api/companion");
-            // Has companion, navigate to tabs
-            navigation.replace("Tabs");
-            return;
-          } catch (error) {
-            // No companion, stay on welcome screen
+      async function checkAuthStatus() {
+        // Small delay to ensure navigation context is ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        try {
+          const session = await authClient.getSession();
+
+          if (!isActive) return;
+
+          if (session?.data?.user) {
+            // User is logged in, check if they have a companion
+            try {
+              await api.get("/api/companion");
+              // Has companion, navigate to tabs
+              if (isActive) {
+                navigation.replace("Tabs");
+              }
+              return;
+            } catch (error) {
+              // No companion, stay on welcome screen
+            }
+          }
+        } catch (error) {
+          console.error("Auth check error:", error);
+        } finally {
+          if (isActive) {
+            setIsChecking(false);
           }
         }
-      } catch (error) {
-        console.error("Auth check error:", error);
-      } finally {
-        setIsChecking(false);
       }
-    }
 
-    checkAuthStatus();
-  }, [navigation]);
+      checkAuthStatus();
+
+      return () => {
+        isActive = false;
+      };
+    }, [navigation])
+  );
 
   if (isChecking) {
     return (
