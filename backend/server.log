@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 117ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 142ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 769 installs across 711 packages (no changes) [1292.00ms]
+Checked 769 installs across 711 packages (no changes) [1376.00ms]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -46,7 +46,6 @@ Failed to find Response internal state key
   💚 Health:     GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/db.ts'
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔐 [Auth] Initializing Better Auth...
@@ -61,6 +60,21 @@ Failed to find Response internal state key
 🎯 Mounting bond routes at /api/bond
 ⚙️  Mounting settings routes at /api/settings
 ⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:       /api/auth/*
+  🤖 Companion:  GET/POST/PUT /api/companion
+  💬 Chat:       GET/POST /api/chat
+  🎯 Bond:       GET /api/bond, POST /api/bond/check-in, /api/bond/gratitude, /api/bond/goal
+  ⚙️  Settings:   GET/PUT /api/settings
+  💚 Health:     GET /health
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 12ms
 <-- GET /api/companion
@@ -68,8 +82,17 @@ Failed to find Response internal state key
 <-- GET /api/chat
 --> GET /api/chat [32m200[0m 3ms
 <-- GET /api/companion
+--> GET /api/companion [32m200[0m 3ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 4ms
+<-- GET /api/companion
 --> GET /api/companion [32m200[0m 2ms
+<-- GET /api/chat
+<-- GET /api/companion
+--> GET /api/chat [32m200[0m 4ms
+--> GET /api/companion [32m200[0m 3ms
 <-- POST /api/chat
+[AI] Using Gemini API key: MISSING
 [AI] Gemini response: {
   "error": {
     "code": 403,
@@ -84,92 +107,18 @@ Failed to find Response internal state key
     status: "PERMISSION_DENIED",
   },
 }
-[AI] Error generating response: 82 |     console.log("[AI] Gemini response:", JSON.stringify(data, null, 2));
-83 |     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-84 | 
-85 |     if (!text) {
-86 |       console.error("[AI] No text found in response. Full response:", data);
-87 |       throw new Error('No text in response');
+[AI] Error generating response: 84 |     console.log("[AI] Gemini response:", JSON.stringify(data, null, 2));
+85 |     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+86 | 
+87 |     if (!text) {
+88 |       console.error("[AI] No text found in response. Full response:", data);
+89 |       throw new Error('No text in response');
                  ^
 error: No text in response
-      at generateAIResponse (/home/user/workspace/backend/src/utils/ai.ts:87:13)
+      at generateAIResponse (/home/user/workspace/backend/src/utils/ai.ts:89:13)
 
---> POST /api/chat [32m200[0m 119ms
+--> POST /api/chat [32m200[0m 120ms
 <-- GET /api/chat
-<-- GET /api/companion
---> GET /api/chat [32m200[0m 3ms
---> GET /api/companion [32m200[0m 3ms
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 5ms
+--> GET /api/chat [32m200[0m 4ms
 <-- GET /api/companion
 --> GET /api/companion [32m200[0m 2ms
-<-- GET /api/chat
---> GET /api/chat [32m200[0m 3ms
-<-- GET /api/companion
---> GET /api/companion [32m200[0m 2ms
-<-- POST /api/chat
-[AI] Gemini response: {
-  "error": {
-    "code": 403,
-    "message": "Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-[AI] No text found in response. Full response: {
-  error: {
-    code: 403,
-    message: "Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.",
-    status: "PERMISSION_DENIED",
-  },
-}
-[AI] Error generating response: 82 |     console.log("[AI] Gemini response:", JSON.stringify(data, null, 2));
-83 |     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-84 | 
-85 |     if (!text) {
-86 |       console.error("[AI] No text found in response. Full response:", data);
-87 |       throw new Error('No text in response');
-                 ^
-error: No text in response
-      at generateAIResponse (/home/user/workspace/backend/src/utils/ai.ts:87:13)
-
---> POST /api/chat [32m200[0m 63ms
-<-- GET /api/chat
-<-- GET /api/companion
---> GET /api/chat [32m200[0m 3ms
---> GET /api/companion [32m200[0m 3ms
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 5ms
-<-- GET /api/companion
---> GET /api/companion [32m200[0m 3ms
-<-- GET /api/companion
-<-- GET /api/chat
---> GET /api/chat [32m200[0m 2ms
---> GET /api/companion [32m200[0m 3ms
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-jsbubptojukj.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, https://preview-jsbubptojukj.share.sandbox.dev
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-🤖 Mounting companion routes at /api/companion
-💬 Mounting chat routes at /api/chat
-🎯 Mounting bond routes at /api/bond
-⚙️  Mounting settings routes at /api/settings
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-jsbubptojukj.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, https://preview-jsbubptojukj.share.sandbox.dev
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-🤖 Mounting companion routes at /api/companion
-💬 Mounting chat routes at /api/chat
-🎯 Mounting bond routes at /api/bond
-⚙️  Mounting settings routes at /api/settings
-⚙️  Starting server...
