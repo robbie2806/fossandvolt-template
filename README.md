@@ -15,7 +15,8 @@ If you're in crisis or need professional help, please contact emergency services
 ## Features
 
 ### 🤖 Personalized AI Companion
-- Name your AI and choose their vibe (Chill, Productive, Playful, or Calm)
+- Name your AI companion during onboarding
+- Your AI has a chill and supportive personality by default
 - Your AI remembers your conversations and adapts to your style
 - Watch your Bond Level grow from 1 to 100+ through interactions
 
@@ -139,7 +140,6 @@ model UserSettings {
 RootStack
 ├── OnboardingWelcome (headerless)
 ├── OnboardingName (headerless)
-├── OnboardingVibe (headerless)
 ├── Tabs
 │   ├── ChatTab (Chat screen)
 │   ├── BondTab (Bond screen)
@@ -160,19 +160,10 @@ RootStack
 - Level 3 → 4: 300 XP
 - etc.
 
-## AI Personality Vibes
+## AI Personality
 
-### Chill & Supportive
-Relaxed, friendly, and understanding. Like a good friend who's always there without judgment.
-
-### Productive & Direct
-Focused, efficient, and motivating. Helps you stay on track with clear, actionable advice.
-
-### Playful & Cheeky
-Fun, lighthearted, and witty. Brightens your day with humor while staying supportive.
-
-### Calm & Reflective
-Peaceful, thoughtful, and mindful. Helps you find clarity and balance through introspection.
+### Chill & Supportive (Default)
+Your AI companion has a relaxed, friendly, and understanding personality. Like a good friend who's always there without judgment, providing support and encouragement as you grow together.
 
 ## Design System
 

@@ -13,7 +13,6 @@ export type RootStackParamList = {
   // Onboarding flow
   OnboardingWelcome: undefined;
   OnboardingName: undefined;
-  OnboardingVibe: { aiName: string };
 
   // Main app tabs
   Tabs: NavigatorScreenParams<BottomTabParamList> | undefined;

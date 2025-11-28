@@ -6,7 +6,6 @@ import { MessageCircle, Target, Settings } from "lucide-react-native";
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
 import OnboardingWelcomeScreen from "@/screens/OnboardingWelcomeScreen";
 import OnboardingNameScreen from "@/screens/OnboardingNameScreen";
-import OnboardingVibeScreen from "@/screens/OnboardingVibeScreen";
 import ChatScreen from "@/screens/ChatScreen";
 import BondScreen from "@/screens/BondScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
@@ -30,11 +29,6 @@ const RootNavigator = () => {
       <RootStack.Screen
         name="OnboardingName"
         component={OnboardingNameScreen}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="OnboardingVibe"
-        component={OnboardingVibeScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen

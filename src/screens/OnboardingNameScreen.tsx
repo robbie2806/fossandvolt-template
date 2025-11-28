@@ -1,16 +1,39 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useMutation } from "@tanstack/react-query";
 import type { RootStackScreenProps } from "@/navigation/types";
+import { api } from "@/lib/api";
+import type { CreateCompanionResponse } from "@/shared/contracts";
 
 type Props = RootStackScreenProps<"OnboardingName">;
 
 const OnboardingNameScreen = ({ navigation }: Props) => {
   const [aiName, setAiName] = useState("Nova");
 
+  const createCompanionMutation = useMutation({
+    mutationFn: async () => {
+      if (!aiName.trim()) throw new Error("Name is required");
+      return api.post<CreateCompanionResponse>("/api/companion", {
+        name: aiName.trim(),
+        vibe: "chill", // Default vibe
+      });
+    },
+    onSuccess: () => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Tabs" }],
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to create companion:", error);
+      alert("Failed to create your AI companion. Please try again.");
+    },
+  });
+
   const handleContinue = () => {
     if (aiName.trim()) {
-      navigation.navigate("OnboardingVibe", { aiName: aiName.trim() });
+      createCompanionMutation.mutate();
     }
   };
 
@@ -30,17 +53,16 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
           <View className="flex-row gap-2 mb-12">
             <View className="w-8 h-1 bg-white/40 rounded-full" />
             <View className="w-8 h-1 bg-white rounded-full" />
-            <View className="w-8 h-1 bg-white/40 rounded-full" />
           </View>
 
           {/* Title */}
           <Text className="text-3xl font-bold text-white text-center mb-4">
-            Name your AI
+            Name your AI companion
           </Text>
 
           {/* Subtitle */}
           <Text className="text-base text-white/80 text-center mb-8">
-            Choose a name for your companion
+            Choose a name that feels right to you
           </Text>
 
           {/* Input */}
@@ -54,6 +76,7 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
               autoFocus
               maxLength={20}
               onSubmitEditing={handleContinue}
+              editable={!createCompanionMutation.isPending}
             />
             <Text className="text-white/60 text-sm text-center mt-3">
               You can change this later in settings
@@ -63,15 +86,19 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
           {/* Continue Button */}
           <Pressable
             onPress={handleContinue}
-            disabled={!aiName.trim()}
-            className={`rounded-2xl px-12 py-4 shadow-lg ${aiName.trim() ? "bg-white active:scale-95" : "bg-white/30"}`}
+            disabled={!aiName.trim() || createCompanionMutation.isPending}
+            className={`rounded-2xl px-12 py-4 shadow-lg ${aiName.trim() && !createCompanionMutation.isPending ? "bg-white active:scale-95" : "bg-white/30"}`}
             style={{ transform: [{ scale: 1 }] }}
           >
-            <Text
-              className={`text-xl font-semibold ${aiName.trim() ? "text-purple-600" : "text-white/50"}`}
-            >
-              Continue
-            </Text>
+            {createCompanionMutation.isPending ? (
+              <ActivityIndicator color="#8B5CF6" />
+            ) : (
+              <Text
+                className={`text-xl font-semibold ${aiName.trim() ? "text-purple-600" : "text-white/50"}`}
+              >
+                Continue
+              </Text>
+            )}
           </Pressable>
         </View>
       </LinearGradient>
