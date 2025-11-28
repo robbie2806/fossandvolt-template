@@ -191,3 +191,11 @@ AI_APICallError: Incorrect API key provided: ''. You can find your API key at ht
 --> GET /api/companion [32m200[0m 3ms
 <-- GET /api/chat
 --> GET /api/chat [32m200[0m 2ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 3ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 2ms
+<-- GET /api/chat
+<-- GET /api/companion
+--> GET /api/chat [32m200[0m 3ms
+--> GET /api/companion [32m200[0m 3ms
