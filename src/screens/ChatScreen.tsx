@@ -9,7 +9,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Send, Sparkles } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
@@ -29,6 +29,7 @@ const ChatScreen = ({ navigation }: Props) => {
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   // Fetch companion info
   const { data: companion } = useQuery({
@@ -92,8 +93,8 @@ const ChatScreen = ({ navigation }: Props) => {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
       >
         {/* Messages */}
         {isLoading ? (
@@ -141,42 +142,44 @@ const ChatScreen = ({ navigation }: Props) => {
         )}
 
         {/* Input */}
-        <View className="bg-white border-t border-gray-200 px-4 py-3">
-          <View className="flex-row items-end gap-3">
-            <TextInput
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Type a message..."
-              placeholderTextColor="#9CA3AF"
-              className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
-              style={{ maxHeight: 100, minHeight: 44 }}
-              multiline
-              maxLength={500}
-              editable={!sendMessageMutation.isPending}
-              returnKeyType="default"
-              blurOnSubmit={false}
-            />
-            <Pressable
-              onPress={handleSend}
-              disabled={!inputText.trim() || sendMessageMutation.isPending}
-              className={`rounded-full p-3 ${
-                inputText.trim() && !sendMessageMutation.isPending
-                  ? "bg-purple-600 active:bg-purple-700"
-                  : "bg-gray-200"
-              }`}
-              style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
-            >
-              {sendMessageMutation.isPending ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Send
-                  size={20}
-                  color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
-                />
-              )}
-            </Pressable>
+        <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "#FFFFFF" }}>
+          <View className="bg-white border-t border-gray-200 px-4 py-3">
+            <View className="flex-row items-end gap-3">
+              <TextInput
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder="Type a message..."
+                placeholderTextColor="#9CA3AF"
+                className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
+                style={{ maxHeight: 100, minHeight: 44 }}
+                multiline
+                maxLength={500}
+                editable={!sendMessageMutation.isPending}
+                returnKeyType="default"
+                blurOnSubmit={false}
+              />
+              <Pressable
+                onPress={handleSend}
+                disabled={!inputText.trim() || sendMessageMutation.isPending}
+                className={`rounded-full p-3 ${
+                  inputText.trim() && !sendMessageMutation.isPending
+                    ? "bg-purple-600 active:bg-purple-700"
+                    : "bg-gray-200"
+                }`}
+                style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
+              >
+                {sendMessageMutation.isPending ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Send
+                    size={20}
+                    color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
+                  />
+                )}
+              </Pressable>
+            </View>
           </View>
-        </View>
+        </SafeAreaView>
       </KeyboardAvoidingView>
     </View>
   );
