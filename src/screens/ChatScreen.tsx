@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Send, Sparkles } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
@@ -70,110 +71,114 @@ const ChatScreen = ({ navigation }: Props) => {
   const messages: Message[] = chatData?.messages || [];
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#F9FAFB" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-    >
-      {/* Header */}
-      <View className="bg-white border-b border-gray-200 px-4 py-4 flex-row items-center justify-between">
-        <View className="flex-row items-center gap-3">
-          <View className="bg-purple-100 rounded-full p-2">
-            <Sparkles size={24} color="#8B5CF6" />
-          </View>
-          <View>
-            <Text className="text-lg font-bold text-gray-900">{companion?.name || "..."}</Text>
-            <View className="flex-row items-center gap-1.5">
-              <View className="w-2 h-2 bg-green-500 rounded-full" />
-              <Text className="text-sm text-gray-500">Bond Level {companion?.bondLevel || 1}</Text>
+    <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FFFFFF" }}>
+        {/* Header */}
+        <View className="bg-white border-b border-gray-200 px-4 py-4 flex-row items-center justify-between">
+          <View className="flex-row items-center gap-3">
+            <View className="bg-purple-100 rounded-full p-2">
+              <Sparkles size={24} color="#8B5CF6" />
             </View>
-          </View>
-        </View>
-      </View>
-
-      {/* Messages */}
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#8B5CF6" />
-        </View>
-      ) : messages.length === 0 ? (
-        <View className="flex-1 justify-center items-center px-8">
-          <Sparkles size={48} color="#D1D5DB" />
-          <Text className="text-gray-400 text-center mt-4 text-lg">
-            Start chatting with {companion?.name || "your AI companion"}!
-          </Text>
-          <Text className="text-gray-400 text-center mt-2 text-sm">
-            Every message helps grow your bond
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
-          renderItem={({ item }) => (
-            <View
-              className={`mb-4 ${item.role === "user" ? "items-end" : "items-start"}`}
-            >
-              <View
-                className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                  item.role === "user"
-                    ? "bg-purple-600"
-                    : "bg-white border border-gray-200"
-                }`}
-              >
-                <Text
-                  className={`text-base ${
-                    item.role === "user" ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  {item.content}
-                </Text>
+            <View>
+              <Text className="text-lg font-bold text-gray-900">{companion?.name || "..."}</Text>
+              <View className="flex-row items-center gap-1.5">
+                <View className="w-2 h-2 bg-green-500 rounded-full" />
+                <Text className="text-sm text-gray-500">Bond Level {companion?.bondLevel || 1}</Text>
               </View>
             </View>
-          )}
-        />
-      )}
-
-      {/* Input */}
-      <View className="bg-white border-t border-gray-200 px-4 py-3">
-        <View className="flex-row items-end gap-3">
-          <TextInput
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Type a message..."
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
-            style={{ maxHeight: 100, minHeight: 44 }}
-            multiline
-            maxLength={500}
-            editable={!sendMessageMutation.isPending}
-            returnKeyType="default"
-            blurOnSubmit={false}
-          />
-          <Pressable
-            onPress={handleSend}
-            disabled={!inputText.trim() || sendMessageMutation.isPending}
-            className={`rounded-full p-3 ${
-              inputText.trim() && !sendMessageMutation.isPending
-                ? "bg-purple-600 active:bg-purple-700"
-                : "bg-gray-200"
-            }`}
-            style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
-          >
-            {sendMessageMutation.isPending ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <Send
-                size={20}
-                color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
-              />
-            )}
-          </Pressable>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </SafeAreaView>
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        {/* Messages */}
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#8B5CF6" />
+          </View>
+        ) : messages.length === 0 ? (
+          <View className="flex-1 justify-center items-center px-8">
+            <Sparkles size={48} color="#D1D5DB" />
+            <Text className="text-gray-400 text-center mt-4 text-lg">
+              Start chatting with {companion?.name || "your AI companion"}!
+            </Text>
+            <Text className="text-gray-400 text-center mt-2 text-sm">
+              Every message helps grow your bond
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+            renderItem={({ item }) => (
+              <View
+                className={`mb-4 ${item.role === "user" ? "items-end" : "items-start"}`}
+              >
+                <View
+                  className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                    item.role === "user"
+                      ? "bg-purple-600"
+                      : "bg-white border border-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`text-base ${
+                      item.role === "user" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {item.content}
+                  </Text>
+                </View>
+              </View>
+            )}
+          />
+        )}
+
+        {/* Input */}
+        <View className="bg-white border-t border-gray-200 px-4 py-3">
+          <View className="flex-row items-end gap-3">
+            <TextInput
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Type a message..."
+              placeholderTextColor="#9CA3AF"
+              className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
+              style={{ maxHeight: 100, minHeight: 44 }}
+              multiline
+              maxLength={500}
+              editable={!sendMessageMutation.isPending}
+              returnKeyType="default"
+              blurOnSubmit={false}
+            />
+            <Pressable
+              onPress={handleSend}
+              disabled={!inputText.trim() || sendMessageMutation.isPending}
+              className={`rounded-full p-3 ${
+                inputText.trim() && !sendMessageMutation.isPending
+                  ? "bg-purple-600 active:bg-purple-700"
+                  : "bg-gray-200"
+              }`}
+              style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
+            >
+              {sendMessageMutation.isPending ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Send
+                  size={20}
+                  color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
+                />
+              )}
+            </Pressable>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
