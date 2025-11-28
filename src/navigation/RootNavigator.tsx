@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { MessageCircle, Target, Settings } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { View, ActivityIndicator } from "react-native";
 
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
 import OnboardingWelcomeScreen from "@/screens/OnboardingWelcomeScreen";
@@ -13,18 +15,51 @@ import ChatScreen from "@/screens/ChatScreen";
 import BondScreen from "@/screens/BondScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
+import { authClient } from "@/lib/authClient";
+import { api } from "@/lib/api";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-interface RootNavigatorProps {
-  hasCompanion: boolean;
-}
+const RootNavigator = () => {
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [initialRoute, setInitialRoute] = useState<"OnboardingWelcome" | "Tabs">("OnboardingWelcome");
 
-const RootNavigator = ({ hasCompanion }: RootNavigatorProps) => {
+  useEffect(() => {
+    async function checkAuthAndCompanion() {
+      try {
+        const session = await authClient.getSession();
+
+        if (session?.data?.user) {
+          try {
+            await api.get("/api/companion");
+            setInitialRoute("Tabs");
+          } catch (error) {
+            setInitialRoute("OnboardingWelcome");
+          }
+        } else {
+          setInitialRoute("OnboardingWelcome");
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        setInitialRoute("OnboardingWelcome");
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    }
+
+    checkAuthAndCompanion();
+  }, []);
+
+  if (isCheckingAuth) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#8B5CF6" }}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
+
   return (
-    <RootStack.Navigator
-      initialRouteName={hasCompanion ? "Tabs" : "OnboardingWelcome"}
-    >
+    <RootStack.Navigator initialRouteName={initialRoute}>
       <RootStack.Screen
         name="OnboardingWelcome"
         component={OnboardingWelcomeScreen}
