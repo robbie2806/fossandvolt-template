@@ -141,7 +141,7 @@ const ChatScreen = ({ navigation }: Props) => {
       )}
 
       {/* Input */}
-      <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: insets.bottom }}>
+      <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: insets.bottom + 80 }}>
         <View className="flex-row items-end gap-3">
           <TextInput
             value={inputText}
