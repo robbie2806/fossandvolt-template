@@ -99,3 +99,40 @@ error: No text in response
 <-- GET /api/companion
 --> GET /api/chat [32m200[0m 3ms
 --> GET /api/companion [32m200[0m 4ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 4ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 3ms
+<-- GET /api/companion
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 3ms
+--> GET /api/companion [32m200[0m 5ms
+Failed to find Response internal state key
+✅ Environment variables validated successfully
+🔐 [Auth] Initializing Better Auth...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://preview-jsbubptojukj.share.sandbox.dev
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, https://preview-jsbubptojukj.share.sandbox.dev
+🔧 Initializing Hono application...
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+🤖 Mounting companion routes at /api/companion
+💬 Mounting chat routes at /api/chat
+🎯 Mounting bond routes at /api/bond
+⚙️  Mounting settings routes at /api/settings
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:       /api/auth/*
+  🤖 Companion:  GET/POST/PUT /api/companion
+  💬 Chat:       GET/POST /api/chat
+  🎯 Bond:       GET /api/bond, POST /api/bond/check-in, /api/bond/gratitude, /api/bond/goal
+  ⚙️  Settings:   GET/PUT /api/settings
+  💚 Health:     GET /health
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+

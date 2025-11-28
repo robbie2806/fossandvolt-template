@@ -79,9 +79,11 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
     );
 
     const data = await response.json();
+    console.log("[AI] Gemini response:", JSON.stringify(data, null, 2));
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 
     if (!text) {
+      console.error("[AI] No text found in response. Full response:", data);
       throw new Error('No text in response');
     }
 
