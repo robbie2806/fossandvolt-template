@@ -122,3 +122,11 @@ error: No text in response
 --> GET /api/chat [32m200[0m 4ms
 <-- GET /api/companion
 --> GET /api/companion [32m200[0m 2ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 8ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 3ms
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 2ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 1ms
