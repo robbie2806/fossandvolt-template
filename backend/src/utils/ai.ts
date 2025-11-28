@@ -58,10 +58,9 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
 
   try {
     const apiKey = process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '';
-    console.log('[AI] Using Gemini API key:', apiKey ? `${apiKey.substring(0, 10)}...` : 'MISSING');
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -131,7 +130,7 @@ Respond with a supportive, personalized message (1-2 sentences) that:
     const apiKey = process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '';
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
