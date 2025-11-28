@@ -74,6 +74,7 @@ const BottomTabNavigator = () => {
         component={ChatScreen}
         options={{
           title: "Chat",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => <MessageCircle size={size} color={color} />,
         }}
       />
