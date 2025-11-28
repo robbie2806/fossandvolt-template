@@ -72,7 +72,11 @@ const ChatScreen = ({ navigation }: Props) => {
   const messages: Message[] = chatData?.messages || [];
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#F9FAFB" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+    >
       <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FFFFFF" }}>
         {/* Header */}
         <View className="bg-white border-b border-gray-200 px-4 py-4 flex-row items-center justify-between">
@@ -137,48 +141,43 @@ const ChatScreen = ({ navigation }: Props) => {
       )}
 
       {/* Input */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      >
-        <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: insets.bottom }}>
-          <View className="flex-row items-end gap-3">
-            <TextInput
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Type a message..."
-              placeholderTextColor="#9CA3AF"
-              className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
-              style={{ maxHeight: 100, minHeight: 44 }}
-              multiline
-              maxLength={500}
-              editable={!sendMessageMutation.isPending}
-              returnKeyType="default"
-              blurOnSubmit={false}
-            />
-            <Pressable
-              onPress={handleSend}
-              disabled={!inputText.trim() || sendMessageMutation.isPending}
-              className={`rounded-full p-3 ${
-                inputText.trim() && !sendMessageMutation.isPending
-                  ? "bg-purple-600 active:bg-purple-700"
-                  : "bg-gray-200"
-              }`}
-              style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
-            >
-              {sendMessageMutation.isPending ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Send
-                  size={20}
-                  color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
-                />
-              )}
-            </Pressable>
-          </View>
+      <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: insets.bottom }}>
+        <View className="flex-row items-end gap-3">
+          <TextInput
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="Type a message..."
+            placeholderTextColor="#9CA3AF"
+            className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
+            style={{ maxHeight: 100, minHeight: 44 }}
+            multiline
+            maxLength={500}
+            editable={!sendMessageMutation.isPending}
+            returnKeyType="default"
+            blurOnSubmit={false}
+          />
+          <Pressable
+            onPress={handleSend}
+            disabled={!inputText.trim() || sendMessageMutation.isPending}
+            className={`rounded-full p-3 ${
+              inputText.trim() && !sendMessageMutation.isPending
+                ? "bg-purple-600 active:bg-purple-700"
+                : "bg-gray-200"
+            }`}
+            style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
+          >
+            {sendMessageMutation.isPending ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Send
+                size={20}
+                color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
+              />
+            )}
+          </Pressable>
         </View>
-      </KeyboardAvoidingView>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
