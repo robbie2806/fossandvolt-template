@@ -1,7 +1,5 @@
-import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { MessageCircle, Target, Settings } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -20,71 +18,86 @@ import { api } from "@/lib/api";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
+// Loading screen component
+const LoadingScreen = () => {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#8B5CF6" }}>
+      <ActivityIndicator size="large" color="#FFFFFF" />
+    </View>
+  );
+};
+
 const RootNavigator = () => {
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [initialRoute, setInitialRoute] = useState<"OnboardingWelcome" | "Tabs">("OnboardingWelcome");
+  const [isReady, setIsReady] = useState(false);
+  const [showTabs, setShowTabs] = useState(false);
 
   useEffect(() => {
-    async function checkAuthAndCompanion() {
+    async function checkAuth() {
       try {
         const session = await authClient.getSession();
-
         if (session?.data?.user) {
           try {
             await api.get("/api/companion");
-            setInitialRoute("Tabs");
+            setShowTabs(true);
           } catch (error) {
-            setInitialRoute("OnboardingWelcome");
+            setShowTabs(false);
           }
         } else {
-          setInitialRoute("OnboardingWelcome");
+          setShowTabs(false);
         }
       } catch (error) {
-        console.error("Error checking auth:", error);
-        setInitialRoute("OnboardingWelcome");
+        console.error("Auth check error:", error);
+        setShowTabs(false);
       } finally {
-        setIsCheckingAuth(false);
+        setIsReady(true);
       }
     }
 
-    checkAuthAndCompanion();
+    checkAuth();
   }, []);
 
-  if (isCheckingAuth) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#8B5CF6" }}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
-      </View>
-    );
-  }
-
   return (
-    <RootStack.Navigator initialRouteName={initialRoute}>
-      <RootStack.Screen
-        name="OnboardingWelcome"
-        component={OnboardingWelcomeScreen}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="OnboardingName"
-        component={OnboardingNameScreen}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="OnboardingVibe"
-        component={OnboardingVibeScreen}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="Tabs"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="LoginModalScreen"
-        component={LoginModalScreen}
-        options={{ presentation: "modal", title: "Login" }}
-      />
+    <RootStack.Navigator
+      initialRouteName={showTabs ? "Tabs" : "OnboardingWelcome"}
+      screenOptions={{
+        contentStyle: { backgroundColor: "#F9FAFB" },
+      }}
+    >
+      {!isReady ? (
+        <RootStack.Screen
+          name="OnboardingWelcome"
+          component={LoadingScreen}
+          options={{ headerShown: false }}
+        />
+      ) : (
+        <>
+          <RootStack.Screen
+            name="OnboardingWelcome"
+            component={OnboardingWelcomeScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="OnboardingName"
+            component={OnboardingNameScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="OnboardingVibe"
+            component={OnboardingVibeScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="Tabs"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="LoginModalScreen"
+            component={LoginModalScreen}
+            options={{ presentation: "modal", title: "Login" }}
+          />
+        </>
+      )}
     </RootStack.Navigator>
   );
 };
