@@ -72,11 +72,7 @@ const ChatScreen = ({ navigation }: Props) => {
   const messages: Message[] = chatData?.messages || [];
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#F9FAFB" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-    >
+    <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FFFFFF" }}>
         {/* Header */}
         <View className="bg-white border-b border-gray-200 px-4 py-4 flex-row items-center justify-between">
@@ -95,89 +91,95 @@ const ChatScreen = ({ navigation }: Props) => {
         </View>
       </SafeAreaView>
 
-      {/* Messages */}
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#8B5CF6" />
-        </View>
-      ) : messages.length === 0 ? (
-        <View className="flex-1 justify-center items-center px-8">
-          <Sparkles size={48} color="#D1D5DB" />
-          <Text className="text-gray-400 text-center mt-4 text-lg">
-            Start chatting with {companion?.name || "your AI companion"}!
-          </Text>
-          <Text className="text-gray-400 text-center mt-2 text-sm">
-            Every message helps grow your bond
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
-          renderItem={({ item }) => (
-            <View
-              className={`mb-4 ${item.role === "user" ? "items-end" : "items-start"}`}
-            >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      >
+        {/* Messages */}
+        {isLoading ? (
+          <View style={{ flex: 1 }} className="justify-center items-center">
+            <ActivityIndicator size="large" color="#8B5CF6" />
+          </View>
+        ) : messages.length === 0 ? (
+          <View style={{ flex: 1 }} className="justify-center items-center px-8">
+            <Sparkles size={48} color="#D1D5DB" />
+            <Text className="text-gray-400 text-center mt-4 text-lg">
+              Start chatting with {companion?.name || "your AI companion"}!
+            </Text>
+            <Text className="text-gray-400 text-center mt-2 text-sm">
+              Every message helps grow your bond
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+            renderItem={({ item }) => (
               <View
-                className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                  item.role === "user"
-                    ? "bg-purple-600"
-                    : "bg-white border border-gray-200"
-                }`}
+                className={`mb-4 ${item.role === "user" ? "items-end" : "items-start"}`}
               >
-                <Text
-                  className={`text-base ${
-                    item.role === "user" ? "text-white" : "text-gray-900"
+                <View
+                  className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                    item.role === "user"
+                      ? "bg-purple-600"
+                      : "bg-white border border-gray-200"
                   }`}
                 >
-                  {item.content}
-                </Text>
+                  <Text
+                    className={`text-base ${
+                      item.role === "user" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {item.content}
+                  </Text>
+                </View>
               </View>
-            </View>
-          )}
-        />
-      )}
-
-      {/* Input */}
-      <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ paddingBottom: insets.bottom + 80 }}>
-        <View className="flex-row items-end gap-3">
-          <TextInput
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Type a message..."
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
-            style={{ maxHeight: 100, minHeight: 44 }}
-            multiline
-            maxLength={500}
-            editable={!sendMessageMutation.isPending}
-            returnKeyType="default"
-            blurOnSubmit={false}
-          />
-          <Pressable
-            onPress={handleSend}
-            disabled={!inputText.trim() || sendMessageMutation.isPending}
-            className={`rounded-full p-3 ${
-              inputText.trim() && !sendMessageMutation.isPending
-                ? "bg-purple-600 active:bg-purple-700"
-                : "bg-gray-200"
-            }`}
-            style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
-          >
-            {sendMessageMutation.isPending ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <Send
-                size={20}
-                color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
-              />
             )}
-          </Pressable>
+          />
+        )}
+
+        {/* Input - Fixed at bottom above tab bar */}
+        <View className="bg-white border-t border-gray-200 px-4 py-3" style={{ marginBottom: 49 + insets.bottom }}>
+          <View className="flex-row items-end gap-3">
+            <TextInput
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Type a message..."
+              placeholderTextColor="#9CA3AF"
+              className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
+              style={{ maxHeight: 100, minHeight: 44 }}
+              multiline
+              maxLength={500}
+              editable={!sendMessageMutation.isPending}
+              returnKeyType="default"
+              blurOnSubmit={false}
+            />
+            <Pressable
+              onPress={handleSend}
+              disabled={!inputText.trim() || sendMessageMutation.isPending}
+              className={`rounded-full p-3 ${
+                inputText.trim() && !sendMessageMutation.isPending
+                  ? "bg-purple-600 active:bg-purple-700"
+                  : "bg-gray-200"
+              }`}
+              style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
+            >
+              {sendMessageMutation.isPending ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Send
+                  size={20}
+                  color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"}
+                />
+              )}
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
