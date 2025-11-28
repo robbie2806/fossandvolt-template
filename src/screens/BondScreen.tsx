@@ -7,6 +7,8 @@ import {
   TextInput,
   ActivityIndicator,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
@@ -214,55 +216,68 @@ const BondScreen = ({ navigation }: Props) => {
         transparent
         onRequestClose={() => setCheckInModalVisible(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6">
-            <Text className="text-2xl font-bold text-gray-900 mb-4">Daily Check-in</Text>
-            <Text className="text-gray-600 mb-4">How are you feeling today?</Text>
-            <View className="flex-row justify-between mb-6">
-              {MOOD_EMOJIS.map((emoji, idx) => (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            className="flex-1 bg-black/50 justify-end"
+            onPress={() => setCheckInModalVisible(false)}
+          >
+            <Pressable className="bg-white rounded-t-3xl p-6" onPress={(e) => e.stopPropagation()}>
+              <Text className="text-2xl font-bold text-gray-900 mb-4">Daily Check-in</Text>
+              <Text className="text-gray-600 mb-4">How are you feeling today?</Text>
+              <View className="flex-row justify-between mb-6">
+                {MOOD_EMOJIS.map((emoji, idx) => (
+                  <Pressable
+                    key={idx}
+                    onPress={() => setSelectedMood(idx + 1)}
+                    className={`p-4 rounded-2xl ${selectedMood === idx + 1 ? "bg-purple-100" : "bg-gray-100"}`}
+                  >
+                    <Text className="text-3xl">{emoji}</Text>
+                  </Pressable>
+                ))}
+              </View>
+              <TextInput
+                value={reflection}
+                onChangeText={setReflection}
+                placeholder="Anything you want to share? (optional)"
+                placeholderTextColor="#9CA3AF"
+                className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
+                style={{ minHeight: 80 }}
+                multiline
+                numberOfLines={3}
+              />
+              <View className="flex-row gap-3">
                 <Pressable
-                  key={idx}
-                  onPress={() => setSelectedMood(idx + 1)}
-                  className={`p-4 rounded-2xl ${selectedMood === idx + 1 ? "bg-purple-100" : "bg-gray-100"}`}
+                  onPress={() => {
+                    setCheckInModalVisible(false);
+                    setSelectedMood(null);
+                    setReflection("");
+                  }}
+                  className="flex-1 bg-gray-200 rounded-2xl py-4"
                 >
-                  <Text className="text-3xl">{emoji}</Text>
+                  <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
                 </Pressable>
-              ))}
-            </View>
-            <TextInput
-              value={reflection}
-              onChangeText={setReflection}
-              placeholder="Anything you want to share? (optional)"
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
-              multiline
-              numberOfLines={3}
-            />
-            <View className="flex-row gap-3">
-              <Pressable
-                onPress={() => setCheckInModalVisible(false)}
-                className="flex-1 bg-gray-200 rounded-2xl py-4"
-              >
-                <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  if (selectedMood) {
-                    checkInMutation.mutate({ mood: selectedMood, reflection });
-                  }
-                }}
-                disabled={!selectedMood || checkInMutation.isPending}
-                className={`flex-1 rounded-2xl py-4 ${selectedMood ? "bg-purple-600" : "bg-gray-300"}`}
-              >
-                {checkInMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-white text-center font-semibold">Submit</Text>
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
+                <Pressable
+                  onPress={() => {
+                    if (selectedMood) {
+                      checkInMutation.mutate({ mood: selectedMood, reflection });
+                    }
+                  }}
+                  disabled={!selectedMood || checkInMutation.isPending}
+                  className={`flex-1 rounded-2xl py-4 ${selectedMood ? "bg-purple-600" : "bg-gray-300"}`}
+                >
+                  {checkInMutation.isPending ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold">Submit</Text>
+                  )}
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Gratitude Modal */}
@@ -272,40 +287,53 @@ const BondScreen = ({ navigation }: Props) => {
         transparent
         onRequestClose={() => setGratitudeModalVisible(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6">
-            <Text className="text-2xl font-bold text-gray-900 mb-4">Gratitude Note</Text>
-            <Text className="text-gray-600 mb-4">What are you grateful for today?</Text>
-            <TextInput
-              value={gratitudeText}
-              onChangeText={setGratitudeText}
-              placeholder="I'm grateful for..."
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
-              multiline
-              numberOfLines={4}
-            />
-            <View className="flex-row gap-3">
-              <Pressable
-                onPress={() => setGratitudeModalVisible(false)}
-                className="flex-1 bg-gray-200 rounded-2xl py-4"
-              >
-                <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => gratitudeMutation.mutate(gratitudeText)}
-                disabled={!gratitudeText.trim() || gratitudeMutation.isPending}
-                className={`flex-1 rounded-2xl py-4 ${gratitudeText.trim() ? "bg-pink-600" : "bg-gray-300"}`}
-              >
-                {gratitudeMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-white text-center font-semibold">Save</Text>
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            className="flex-1 bg-black/50 justify-end"
+            onPress={() => setGratitudeModalVisible(false)}
+          >
+            <Pressable className="bg-white rounded-t-3xl p-6" onPress={(e) => e.stopPropagation()}>
+              <Text className="text-2xl font-bold text-gray-900 mb-4">Gratitude Note</Text>
+              <Text className="text-gray-600 mb-4">What are you grateful for today?</Text>
+              <TextInput
+                value={gratitudeText}
+                onChangeText={setGratitudeText}
+                placeholder="I'm grateful for..."
+                placeholderTextColor="#9CA3AF"
+                className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
+                style={{ minHeight: 100 }}
+                multiline
+                numberOfLines={4}
+                autoFocus
+              />
+              <View className="flex-row gap-3">
+                <Pressable
+                  onPress={() => {
+                    setGratitudeModalVisible(false);
+                    setGratitudeText("");
+                  }}
+                  className="flex-1 bg-gray-200 rounded-2xl py-4"
+                >
+                  <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => gratitudeMutation.mutate(gratitudeText)}
+                  disabled={!gratitudeText.trim() || gratitudeMutation.isPending}
+                  className={`flex-1 rounded-2xl py-4 ${gratitudeText.trim() ? "bg-pink-600" : "bg-gray-300"}`}
+                >
+                  {gratitudeMutation.isPending ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold">Save</Text>
+                  )}
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Goal Modal */}
@@ -315,40 +343,53 @@ const BondScreen = ({ navigation }: Props) => {
         transparent
         onRequestClose={() => setGoalModalVisible(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6">
-            <Text className="text-2xl font-bold text-gray-900 mb-4">Mini Goal</Text>
-            <Text className="text-gray-600 mb-4">What&apos;s one thing you want to accomplish today?</Text>
-            <TextInput
-              value={goalText}
-              onChangeText={setGoalText}
-              placeholder="Today I will..."
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
-              multiline
-              numberOfLines={3}
-            />
-            <View className="flex-row gap-3">
-              <Pressable
-                onPress={() => setGoalModalVisible(false)}
-                className="flex-1 bg-gray-200 rounded-2xl py-4"
-              >
-                <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => goalMutation.mutate(goalText)}
-                disabled={!goalText.trim() || goalMutation.isPending}
-                className={`flex-1 rounded-2xl py-4 ${goalText.trim() ? "bg-blue-600" : "bg-gray-300"}`}
-              >
-                {goalMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-white text-center font-semibold">Set Goal</Text>
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            className="flex-1 bg-black/50 justify-end"
+            onPress={() => setGoalModalVisible(false)}
+          >
+            <Pressable className="bg-white rounded-t-3xl p-6" onPress={(e) => e.stopPropagation()}>
+              <Text className="text-2xl font-bold text-gray-900 mb-4">Mini Goal</Text>
+              <Text className="text-gray-600 mb-4">What&apos;s one thing you want to accomplish today?</Text>
+              <TextInput
+                value={goalText}
+                onChangeText={setGoalText}
+                placeholder="Today I will..."
+                placeholderTextColor="#9CA3AF"
+                className="bg-gray-100 rounded-2xl p-4 mb-4 text-gray-900"
+                style={{ minHeight: 80 }}
+                multiline
+                numberOfLines={3}
+                autoFocus
+              />
+              <View className="flex-row gap-3">
+                <Pressable
+                  onPress={() => {
+                    setGoalModalVisible(false);
+                    setGoalText("");
+                  }}
+                  className="flex-1 bg-gray-200 rounded-2xl py-4"
+                >
+                  <Text className="text-gray-700 text-center font-semibold">Cancel</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => goalMutation.mutate(goalText)}
+                  disabled={!goalText.trim() || goalMutation.isPending}
+                  className={`flex-1 rounded-2xl py-4 ${goalText.trim() ? "bg-blue-600" : "bg-gray-300"}`}
+                >
+                  {goalMutation.isPending ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold">Set Goal</Text>
+                  )}
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
