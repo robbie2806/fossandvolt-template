@@ -139,19 +139,19 @@ const ChatScreen = ({ navigation }: Props) => {
       {/* Input */}
       <View className="bg-white border-t border-gray-200 px-4 py-3">
         <View className="flex-row items-end gap-3">
-          <View className="flex-1">
-            <TextInput
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Type a message..."
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
-              style={{ maxHeight: 100 }}
-              multiline
-              maxLength={500}
-              editable={!sendMessageMutation.isPending}
-            />
-          </View>
+          <TextInput
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="Type a message..."
+            placeholderTextColor="#9CA3AF"
+            className="flex-1 bg-gray-100 rounded-2xl px-5 py-3 text-base text-gray-900"
+            style={{ maxHeight: 100, minHeight: 44 }}
+            multiline
+            maxLength={500}
+            editable={!sendMessageMutation.isPending}
+            returnKeyType="default"
+            blurOnSubmit={false}
+          />
           <Pressable
             onPress={handleSend}
             disabled={!inputText.trim() || sendMessageMutation.isPending}
@@ -160,6 +160,7 @@ const ChatScreen = ({ navigation }: Props) => {
                 ? "bg-purple-600 active:bg-purple-700"
                 : "bg-gray-200"
             }`}
+            style={{ height: 44, width: 44, justifyContent: "center", alignItems: "center" }}
           >
             {sendMessageMutation.isPending ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
