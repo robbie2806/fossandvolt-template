@@ -1,11 +1,4 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateText } from "ai";
 import { env } from "../env";
-
-// Initialize OpenAI client
-const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
-});
 
 interface GenerateAIResponseParams {
   companionName: string;
@@ -52,23 +45,45 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
     .replace("{bondLevel}", bondLevel.toString())
     .replace("{vibePrompt}", vibePrompt.replace("{companionName}", companionName));
 
-  // Build messages array for context
-  const messages = [
-    { role: "system" as const, content: systemPrompt },
-    ...chatHistory.slice(-6).map((msg) => ({
-      role: msg.role,
-      content: msg.content,
-    })),
-  ];
+  // Build contents array for Gemini
+  const contents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
+
+  // Add chat history
+  for (const msg of chatHistory.slice(-6)) {
+    contents.push({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }]
+    });
+  }
 
   try {
-    // Generate response using Vercel AI SDK
-    const { text } = await generateText({
-      model: openai("gpt-4o-mini"),
-      messages,
-      temperature: 0.8,
-      maxTokens: 200,
-    });
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent',
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 200
+          }
+        })
+      }
+    );
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+
+    if (!text) {
+      throw new Error('No text in response');
+    }
 
     return text;
   } catch (error) {
@@ -109,12 +124,38 @@ Respond with a supportive, personalized message (1-2 sentences) that:
 `;
 
   try {
-    const { text } = await generateText({
-      model: openai("gpt-4o-mini"),
-      messages: [{ role: "system", content: systemPrompt }],
-      temperature: 0.9,
-      maxTokens: 100,
-    });
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent',
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
+          },
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: 'Generate a response for my check-in.' }]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.9,
+            maxOutputTokens: 100
+          }
+        })
+      }
+    );
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+
+    if (!text) {
+      throw new Error('No text in response');
+    }
 
     return text;
   } catch (error) {
