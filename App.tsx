@@ -13,7 +13,7 @@ import { api } from "@/lib/api";
 
 function AppNavigator() {
   const [isReady, setIsReady] = useState(false);
-  const [initialRoute, setInitialRoute] = useState<"OnboardingWelcome" | "Tabs">("OnboardingWelcome");
+  const [hasCompanion, setHasCompanion] = useState(false);
 
   useEffect(() => {
     async function checkAuthAndCompanion() {
@@ -26,18 +26,18 @@ function AppNavigator() {
           try {
             await api.get("/api/companion");
             // Has companion, go to main tabs
-            setInitialRoute("Tabs");
+            setHasCompanion(true);
           } catch (error) {
             // No companion, go to onboarding
-            setInitialRoute("OnboardingWelcome");
+            setHasCompanion(false);
           }
         } else {
-          // Not logged in, go to onboarding (which will show login if needed)
-          setInitialRoute("OnboardingWelcome");
+          // Not logged in, go to onboarding
+          setHasCompanion(false);
         }
       } catch (error) {
         console.error("Error checking auth:", error);
-        setInitialRoute("OnboardingWelcome");
+        setHasCompanion(false);
       } finally {
         setIsReady(true);
       }
@@ -56,7 +56,7 @@ function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <RootStackNavigator key={initialRoute} />
+      <RootStackNavigator hasCompanion={hasCompanion} />
       <StatusBar style="auto" />
     </NavigationContainer>
   );

@@ -15,9 +15,16 @@ import SettingsScreen from "@/screens/SettingsScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const RootNavigator = () => {
+
+interface RootNavigatorProps {
+  hasCompanion: boolean;
+}
+
+const RootNavigator = ({ hasCompanion }: RootNavigatorProps) => {
   return (
-    <RootStack.Navigator initialRouteName="OnboardingWelcome">
+    <RootStack.Navigator
+      initialRouteName={hasCompanion ? "Tabs" : "OnboardingWelcome"}
+    >
       <RootStack.Screen
         name="OnboardingWelcome"
         component={OnboardingWelcomeScreen}
