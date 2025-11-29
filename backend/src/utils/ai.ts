@@ -45,43 +45,48 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
     .replace("{bondLevel}", bondLevel.toString())
     .replace("{vibePrompt}", vibePrompt.replace("{companionName}", companionName));
 
-  // Build contents array for Gemini
-  const contents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
+  // Build messages array for OpenAI
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemPrompt }
+  ];
 
   // Add chat history
   for (const msg of chatHistory.slice(-6)) {
-    contents.push({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }]
+    messages.push({
+      role: msg.role,
+      content: msg.content
     });
   }
 
+  // Add current user message
+  messages.push({
+    role: "user",
+    content: userMessage
+  });
+
   try {
-    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '';
+    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+      'https://api.openai.com/v1/chat/completions',
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          contents,
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 200
-          }
+          model: 'gpt-4o-mini',
+          messages,
+          temperature: 0.8,
+          max_tokens: 200
         })
       }
     );
 
     const data = await response.json();
-    console.log("[AI] Gemini response:", JSON.stringify(data, null, 2));
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    console.log("[AI] OpenAI response:", JSON.stringify(data, null, 2));
+    const text = data.choices?.[0]?.message?.content ?? '';
 
     if (!text) {
       console.error("[AI] No text found in response. Full response:", data);
@@ -127,35 +132,30 @@ Respond with a supportive, personalized message (1-2 sentences) that:
 `;
 
   try {
-    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY || '';
+    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+      'https://api.openai.com/v1/chat/completions',
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: 'Generate a response for my check-in.' }]
-            }
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: 'Generate a response for my check-in.' }
           ],
-          generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 100
-          }
+          temperature: 0.9,
+          max_tokens: 100
         })
       }
     );
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const text = data.choices?.[0]?.message?.content ?? '';
 
     if (!text) {
       throw new Error('No text in response');
