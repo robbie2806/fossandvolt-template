@@ -19,23 +19,23 @@ type Props = BottomTabScreenProps<"PixieVoltTab">;
 const getBlipkinImage = (evolutionStage: string, megaForm?: string | null) => {
   if (evolutionStage === "mega" && megaForm) {
     const megaImages: Record<string, any> = {
-      nurturer: require("@/assets/blipkin-mega-nurturer.png"),
-      explorer: require("@/assets/blipkin-mega-nurturer.png"), // Using nurturer for explorer (you can add explorer later)
-      chaos: require("@/assets/blipkin-mega-chaos.png"),
-      calm: require("@/assets/blipkin-mega-calm.png"),
+      nurturer: require("../../assets/blipkin-mega-nurturer.png"),
+      explorer: require("../../assets/blipkin-mega-nurturer.png"), // Using nurturer for explorer (you can add explorer later)
+      chaos: require("../../assets/blipkin-mega-chaos.png"),
+      calm: require("../../assets/blipkin-mega-calm.png"),
     };
-    return megaImages[megaForm] || require("@/assets/blipkin-adult.png");
+    return megaImages[megaForm] || require("../../assets/blipkin-adult.png");
   }
 
   const stageImages: Record<string, any> = {
-    baby: require("@/assets/blipkin-baby.png"),
-    child: require("@/assets/blipkin-child.png"),
-    teen: require("@/assets/blipkin-teen.png"),
-    adult: require("@/assets/blipkin-adult.png"),
-    elder: require("@/assets/blipkin-elder.png"),
+    baby: require("../../assets/blipkin-baby.png"),
+    child: require("../../assets/blipkin-child.png"),
+    teen: require("../../assets/blipkin-teen.png"),
+    adult: require("../../assets/blipkin-adult.png"),
+    elder: require("../../assets/blipkin-elder.png"),
   };
 
-  return stageImages[evolutionStage] || require("@/assets/blipkin-baby.png");
+  return stageImages[evolutionStage] || require("../../assets/blipkin-baby.png");
 };
 
 const PixieVoltScreen = ({ navigation }: Props) => {
