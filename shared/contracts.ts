@@ -1,6 +1,6 @@
 // contracts.ts
-// BondNode API Contracts
-// Shared schemas and types for the BondNode AI companion app
+// PixieVolt AI API Contracts
+// Shared schemas and types for the PixieVolt AI companion app
 
 import { z } from "zod";
 

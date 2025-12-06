@@ -49,7 +49,7 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 console.log("📁 Serving static files from uploads/ directory");
 app.use("/uploads/*", serveStatic({ root: "./" }));
 
-// Mount BondNode route modules
+// Mount PixieVolt AI route modules
 console.log("🤖 Mounting companion routes at /api/companion");
 app.route("/api/companion", companionRouter);
 
