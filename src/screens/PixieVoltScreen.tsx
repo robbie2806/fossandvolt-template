@@ -223,20 +223,20 @@ const PixieVoltScreen = ({ navigation }: Props) => {
             <Pressable
               onPress={() => feedMutation.mutate()}
               disabled={feedMutation.isPending}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-md active:scale-95"
+              className="bg-white rounded-2xl shadow-md active:scale-95 border border-gray-100"
               style={{ transform: [{ scale: 1 }] }}
             >
               <View className="flex-row items-center justify-between p-5">
                 <View className="flex-row items-center gap-4">
-                  <View className="bg-white/20 rounded-full p-3">
-                    <Apple size={28} color="#FFFFFF" strokeWidth={2} />
+                  <View className="bg-purple-100 rounded-full p-3">
+                    <Apple size={28} color="#8B5CF6" strokeWidth={2} />
                   </View>
                   <View>
-                    <Text className="text-white text-lg font-bold">Feed</Text>
-                    <Text className="text-white/80 text-sm">-25 Hunger • +5 XP • +3 Bond</Text>
+                    <Text className="text-purple-600 text-lg font-bold">Feed</Text>
+                    <Text className="text-purple-400 text-sm">-25 Hunger • +5 XP • +3 Bond</Text>
                   </View>
                 </View>
-                {feedMutation.isPending && <ActivityIndicator color="#FFFFFF" />}
+                {feedMutation.isPending && <ActivityIndicator color="#8B5CF6" />}
               </View>
             </Pressable>
 
@@ -244,37 +244,37 @@ const PixieVoltScreen = ({ navigation }: Props) => {
             <Pressable
               onPress={() => playMutation.mutate()}
               disabled={playMutation.isPending}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl shadow-md active:scale-95"
+              className="bg-white rounded-2xl shadow-md active:scale-95 border border-gray-100"
               style={{ transform: [{ scale: 1 }] }}
             >
               <View className="flex-row items-center justify-between p-5">
                 <View className="flex-row items-center gap-4">
-                  <View className="bg-white/20 rounded-full p-3">
-                    <Gamepad2 size={28} color="#FFFFFF" strokeWidth={2} />
+                  <View className="bg-purple-100 rounded-full p-3">
+                    <Gamepad2 size={28} color="#8B5CF6" strokeWidth={2} />
                   </View>
                   <View>
-                    <Text className="text-white text-lg font-bold">Play</Text>
-                    <Text className="text-white/80 text-sm">-10 Energy • +8 XP • +5 Bond</Text>
+                    <Text className="text-purple-600 text-lg font-bold">Play</Text>
+                    <Text className="text-purple-400 text-sm">-10 Energy • +8 XP • +5 Bond</Text>
                   </View>
                 </View>
-                {playMutation.isPending && <ActivityIndicator color="#FFFFFF" />}
+                {playMutation.isPending && <ActivityIndicator color="#8B5CF6" />}
               </View>
             </Pressable>
 
             {/* Chat Button */}
             <Pressable
               onPress={handleChat}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-md active:scale-95"
+              className="bg-white rounded-2xl shadow-md active:scale-95 border border-gray-100"
               style={{ transform: [{ scale: 1 }] }}
             >
               <View className="flex-row items-center justify-between p-5">
                 <View className="flex-row items-center gap-4">
-                  <View className="bg-white/20 rounded-full p-3">
-                    <MessageCircle size={28} color="#FFFFFF" strokeWidth={2} />
+                  <View className="bg-purple-100 rounded-full p-3">
+                    <MessageCircle size={28} color="#8B5CF6" strokeWidth={2} />
                   </View>
                   <View>
-                    <Text className="text-white text-lg font-bold">Chat</Text>
-                    <Text className="text-white/80 text-sm">Talk with {blipkin.name}</Text>
+                    <Text className="text-purple-600 text-lg font-bold">Chat</Text>
+                    <Text className="text-purple-400 text-sm">Talk with {blipkin.name}</Text>
                   </View>
                 </View>
               </View>
