@@ -377,6 +377,14 @@ Before distributing to testers, verify:
 
 ## Recent Changes
 
+### Energy Store Crash Fix (Dec 6, 2025)
+- **FIXED**: App no longer crashes when trying to purchase energy
+- **IMPROVED**: Energy Store now uses safe RevenueCat wrapper instead of direct SDK calls
+- **IMPROVED**: Graceful error handling when RevenueCat is not configured
+- **NEW**: Visual warning when purchases aren't available
+- **NEW**: Clear error messages instead of app crashes
+- **BETTER UX**: Users are informed that energy will restore for free in 3 hours
+
 ### Evolution Animation & Level Information (Dec 6, 2025)
 - **NEW**: Beautiful evolution animation when your Blipkin evolves!
   - Shrink and fade effect

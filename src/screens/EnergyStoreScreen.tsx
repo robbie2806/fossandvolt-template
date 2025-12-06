@@ -3,7 +3,8 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from "rea
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Zap, Clock } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Purchases, { PurchasesPackage } from "react-native-purchases";
+import type { PurchasesPackage } from "react-native-purchases";
+import * as revenueCatClient from "@/lib/revenuecatClient";
 import { api } from "@/lib/api";
 import type { RootStackParamList } from "@/navigation/types";
 
@@ -48,32 +49,55 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
   const { timeUntilRestore } = route.params || {};
 
   const [packages, setPackages] = React.useState<Record<string, PurchasesPackage>>({});
+  const [isRevenueCatConfigured, setIsRevenueCatConfigured] = React.useState(false);
 
   React.useEffect(() => {
-    loadPackages();
+    checkRevenueCatAndLoadPackages();
   }, []);
 
-  const loadPackages = async () => {
-    try {
-      const offerings = await Purchases.getOfferings();
-      const energyOffering = offerings.all["energy_store"];
+  const checkRevenueCatAndLoadPackages = async () => {
+    // Check if RevenueCat is configured
+    const isConfigured = revenueCatClient.isRevenueCatEnabled();
+    setIsRevenueCatConfigured(isConfigured);
 
-      if (energyOffering) {
-        const pkgs: Record<string, PurchasesPackage> = {};
-        energyOffering.availablePackages.forEach((pkg) => {
-          pkgs[pkg.identifier] = pkg;
-        });
-        setPackages(pkgs);
-      }
-    } catch (error) {
-      console.error("Error loading packages:", error);
+    if (!isConfigured) {
+      console.log("[EnergyStore] RevenueCat not configured - showing message to user");
+      return;
+    }
+
+    // Load packages
+    const offeringsResult = await revenueCatClient.getOfferings();
+
+    if (!offeringsResult.ok) {
+      console.log("[EnergyStore] Failed to load offerings:", offeringsResult.reason);
+      return;
+    }
+
+    const energyOffering = offeringsResult.data.all["energy_store"];
+
+    if (energyOffering) {
+      const pkgs: Record<string, PurchasesPackage> = {};
+      energyOffering.availablePackages.forEach((pkg) => {
+        pkgs[pkg.identifier] = pkg;
+      });
+      setPackages(pkgs);
+    } else {
+      console.log("[EnergyStore] No energy_store offering found");
     }
   };
 
   const purchaseMutation = useMutation({
     mutationFn: async ({ packageId, rcPackage }: { packageId: string; rcPackage: PurchasesPackage }) => {
-      // Purchase through RevenueCat
-      const purchaseResult = await Purchases.purchasePackage(rcPackage);
+      // Purchase through RevenueCat using safe wrapper
+      const purchaseResult = await revenueCatClient.purchasePackage(rcPackage);
+
+      if (!purchaseResult.ok) {
+        throw new Error(
+          purchaseResult.reason === "not_configured"
+            ? "RevenueCat is not configured. Please set up payments in the app."
+            : "Purchase failed. Please try again."
+        );
+      }
 
       // Find energy amount for this package
       const energyPkg = ENERGY_PACKAGES.find((p) => p.lookupKey === rcPackage.identifier);
@@ -85,7 +109,7 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
         energyAmount: energyPkg.energy,
       });
 
-      return purchaseResult;
+      return purchaseResult.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blipkin"] });
@@ -94,14 +118,25 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
       ]);
     },
     onError: (error: any) => {
+      console.log("[EnergyStore] Purchase error:", error);
       Alert.alert("Purchase Failed", error.message || "Something went wrong. Please try again.");
     },
   });
 
   const handlePurchase = (pkg: typeof ENERGY_PACKAGES[0]) => {
+    // Check if RevenueCat is configured first
+    if (!isRevenueCatConfigured) {
+      Alert.alert(
+        "Payments Not Set Up",
+        "In-app purchases are not configured yet. Please contact support or wait for free energy restore.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
     const rcPackage = packages[pkg.lookupKey];
     if (!rcPackage) {
-      Alert.alert("Error", "Package not available");
+      Alert.alert("Error", "Package not available. Please try again later.");
       return;
     }
 
@@ -149,6 +184,18 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
             </View>
             <Text className="text-blue-700 text-sm text-center mt-2">
               Or purchase energy below to keep playing now!
+            </Text>
+          </View>
+        )}
+
+        {/* RevenueCat Not Configured Warning */}
+        {!isRevenueCatConfigured && (
+          <View className="bg-orange-50 rounded-2xl p-4 mb-6 border border-orange-200">
+            <Text className="text-orange-900 font-semibold text-center mb-2">
+              ⚠️ Purchases Not Available
+            </Text>
+            <Text className="text-orange-700 text-sm text-center">
+              In-app purchases are not configured yet. Your energy will restore automatically in 3 hours for free!
             </Text>
           </View>
         )}

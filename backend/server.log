@@ -7,16 +7,53 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 223ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 224ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 769 installs across 711 packages (no changes) [1.63s]
+Checked 769 installs across 711 packages (no changes) [1.62s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
+Failed to find Response internal state key
+✅ Environment variables validated successfully
+🔐 [Auth] Initializing Better Auth...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://preview-nxkfmvjejlks.share.sandbox.dev
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, https://preview-nxkfmvjejlks.share.sandbox.dev
+🔧 Initializing Hono application...
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+🤖 Mounting companion routes at /api/companion
+💬 Mounting chat routes at /api/chat
+🎯 Mounting bond routes at /api/bond
+⚙️  Mounting settings routes at /api/settings
+✨ Mounting Blipkin routes at /api/blipkin
+🛍️  Mounting Shop routes at /api/shop
+🌐 Mounting BlipNet routes at /api/blipnet
+🏠 Mounting Room routes at /api/room
+🎮 Mounting MiniGames routes at /api/minigames
+📔 Mounting Journal routes at /api/journal
+🎪 Mounting Events routes at /api/events
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:       /api/auth/*
+  🤖 Companion:  GET/POST/PUT /api/companion
+  💬 Chat:       GET/POST /api/chat
+  🎯 Bond:       GET /api/bond, POST /api/bond/check-in, /api/bond/gratitude, /api/bond/goal
+  ⚙️  Settings:   GET/PUT /api/settings
+  ✨ Blipkin:    GET/POST/PUT /api/blipkin, POST /api/blipkin/feed, /api/blipkin/play
+  💚 Health:     GET /health
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔐 [Auth] Initializing Better Auth...
@@ -106,6 +143,33 @@ Failed to find Response internal state key
 [AI] Blipkin - API key from CODEX_API_KEY: true
 [AI] Blipkin - Final API key present: true Length: 48
 --> POST /api/chat [32m200[0m 1s
+<-- GET /api/blipkin
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 4ms
+--> GET /api/blipkin [32m200[0m 9ms
+<-- POST /api/chat
+[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
+[AI] Blipkin - API key from CODEX_API_KEY: true
+[AI] Blipkin - Final API key present: true Length: 48
+--> POST /api/chat [32m200[0m 1s
+<-- GET /api/chat
+<-- GET /api/blipkin
+--> GET /api/chat [32m200[0m 4ms
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/chat
+[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
+[AI] Blipkin - API key from CODEX_API_KEY: true
+[AI] Blipkin - Final API key present: true Length: 48
+--> POST /api/chat [32m200[0m 2s
+<-- GET /api/chat
+<-- GET /api/blipkin
+--> GET /api/chat [32m200[0m 4ms
+--> GET /api/blipkin [32m200[0m 4ms
+<-- POST /api/chat
+[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
+[AI] Blipkin - API key from CODEX_API_KEY: true
+[AI] Blipkin - Final API key present: true Length: 48
+--> POST /api/chat [32m200[0m 965ms
 <-- GET /api/chat
 <-- GET /api/blipkin
 --> GET /api/chat [32m200[0m 3ms
@@ -114,16 +178,108 @@ Failed to find Response internal state key
 [AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
 [AI] Blipkin - API key from CODEX_API_KEY: true
 [AI] Blipkin - Final API key present: true Length: 48
---> POST /api/chat [32m200[0m 2s
+--> POST /api/chat [32m200[0m 1s
 <-- GET /api/blipkin
 <-- GET /api/chat
+--> GET /api/chat [32m200[0m 2ms
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/chat
+[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
+[AI] Blipkin - API key from CODEX_API_KEY: true
+[AI] Blipkin - Final API key present: true Length: 48
+--> POST /api/chat [32m200[0m 3s
+<-- GET /api/chat
+<-- GET /api/blipkin
+--> GET /api/chat [32m200[0m 4ms
+--> GET /api/blipkin [32m200[0m 6ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/chat
+[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
+[AI] Blipkin - API key from CODEX_API_KEY: true
+[AI] Blipkin - Final API key present: true Length: 48
+--> POST /api/chat [32m200[0m 1s
+<-- GET /api/chat
+<-- GET /api/blipkin
 --> GET /api/chat [32m200[0m 3ms
---> GET /api/blipkin [32m200[0m 8ms
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/feed
+--> POST /api/blipkin/feed [32m200[0m 12ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 14ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 10ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 13ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 9ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 9ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 11ms
 <-- GET /api/blipkin
 --> GET /api/blipkin [32m200[0m 9ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 17ms
 <-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 26ms
+--> GET /api/blipkin [32m200[0m 7ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 9ms
 <-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 10ms
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 9ms
 <-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 11ms
+--> GET /api/blipkin [32m200[0m 3ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [32m200[0m 19ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [33m400[0m 5ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 4ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 2ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 2ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- POST /api/blipkin/play
+--> POST /api/blipkin/play [33m400[0m 5ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 3ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 2ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- GET /api/blipkin
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 2ms
+--> GET /api/blipkin [32m200[0m 5ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 3ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 2ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 6ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 7ms
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 4ms
