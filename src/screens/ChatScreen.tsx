@@ -83,7 +83,9 @@ const ChatScreen = ({ navigation, route }: Props) => {
               <Text className="text-lg font-bold text-gray-900">{blipkin?.name || "..."}</Text>
               <View className="flex-row items-center gap-1.5">
                 <View className="w-2 h-2 bg-green-500 rounded-full" />
-                <Text className="text-sm text-gray-500">Level {blipkin?.level || 1}</Text>
+                <Text className="text-sm text-gray-500">
+                  Level {blipkin?.level || 1} • {blipkin?.xp || 0}/{(blipkin?.level || 1) * 100} XP
+                </Text>
               </View>
             </View>
           </View>
