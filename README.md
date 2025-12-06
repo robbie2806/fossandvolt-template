@@ -364,6 +364,14 @@ Before distributing to testers, verify:
 
 ## Recent Changes
 
+### Database & Asset Path Fixes (Dec 6, 2025)
+- **FIXED**: Applied pending Blipkin table migration - database now fully initialized
+- **FIXED**: Corrected asset paths in PixieVoltScreen - changed from `@/assets` alias to relative paths `../../assets`
+- **FIXED**: Removed expo-router plugin from app.json (app uses React Navigation)
+- **RESOLVED**: "Failed to create Blipkin" error - database table now exists with all required columns
+- **RESOLVED**: Asset loading errors - all Blipkin evolution sprites now load correctly
+- App is now fully functional and ready to use!
+
 ### Blipkin Pixel Art Evolution Sprites Added! (Dec 6, 2025)
 - **NEW**: Beautiful pixel art sprites for all 6 evolution stages
 - **ASSETS**: Added proper Blipkin images:
