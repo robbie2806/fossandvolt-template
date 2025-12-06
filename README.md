@@ -364,6 +364,29 @@ Before distributing to testers, verify:
 
 ## Recent Changes
 
+### Energy System & In-App Purchases (Dec 6, 2025)
+- **NEW**: Complete energy system for balanced gameplay
+  - Playing costs 10 energy per session
+  - Energy auto-restores after 3 hours (free)
+  - Optional energy purchases to keep playing immediately
+- **NEW**: In-App Purchases via RevenueCat
+  - Small Energy Bundle: 30 energy for $2.99 AUD
+  - Medium Energy Bundle: 60 energy for $4.99 AUD (20% bonus value)
+  - Large Energy Bundle: 150 energy for $10.99 AUD (30% bonus value!)
+  - Emergency Restore: Full energy for $2.99 AUD
+- **NEW**: 3x Daily Feeding Requirement
+  - Feed your Blipkin 3 times per day
+  - Missing feeds = faster energy drain (-20 energy per missed feed)
+  - Tracks daily feed count and resets every 24 hours
+- **NEW**: Energy Store screen with beautiful UI
+  - Shows time until energy restore
+  - Displays all energy packages with pricing
+  - Integrates with RevenueCat for purchases
+- **BALANCED**: Fair monetization - never pay-to-win
+  - Core gameplay always free
+  - Purchases are optional convenience
+  - No forced waits or punishing mechanics
+
 ### Complete Database Fix & UI Improvements (Dec 6, 2025)
 - **FIXED**: Created all missing BlipNet database tables (currency_wallet, shop_item, inventory_item, blipkin_room, etc.)
 - **FIXED**: Feed and Play buttons now work correctly - Blipkin stats update properly

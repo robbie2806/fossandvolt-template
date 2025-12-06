@@ -21,6 +21,9 @@ export type RootStackParamList = {
   // Main app tabs
   Tabs: NavigatorScreenParams<BottomTabParamList> | undefined;
 
+  // Energy Store
+  EnergyStore: { timeUntilRestore?: number } | undefined;
+
   // Auth
   LoginModalScreen: undefined;
 };

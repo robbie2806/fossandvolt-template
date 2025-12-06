@@ -83,6 +83,33 @@ const PixieVoltScreen = ({ navigation }: Props) => {
         Alert.alert("Fun!", data.message, [{ text: "OK" }]);
       }
     },
+    onError: (error: any) => {
+      // Check if this is a "needs rest" error
+      try {
+        const errorMessage = error.message || "";
+        if (errorMessage.includes("needs to rest") || errorMessage.includes("needsRest")) {
+          // Extract time until restore from error if available
+          const timeMatch = errorMessage.match(/(\d+)/);
+          const timeUntilRestore = timeMatch ? parseInt(timeMatch[0]) : 3 * 60 * 60 * 1000;
+
+          Alert.alert(
+            "Energy Depleted! ⚡",
+            "Your Blipkin needs to rest for 3 hours, or you can purchase energy to keep playing now!",
+            [
+              { text: "Wait 3 Hours", style: "cancel" },
+              {
+                text: "Buy Energy",
+                onPress: () => navigation.navigate("EnergyStore", { timeUntilRestore }),
+              },
+            ]
+          );
+        } else {
+          Alert.alert("Error", errorMessage);
+        }
+      } catch {
+        Alert.alert("Error", "Failed to play with Blipkin");
+      }
+    },
   });
 
   const handleChat = () => {

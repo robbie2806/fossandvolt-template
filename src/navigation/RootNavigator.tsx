@@ -13,6 +13,7 @@ import BondScreen from "@/screens/BondScreen";
 import PixieVoltScreen from "@/screens/PixieVoltScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
+import EnergyStoreScreen from "@/screens/EnergyStoreScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -48,6 +49,11 @@ const RootNavigator = () => {
         name="Tabs"
         component={BottomTabNavigator}
         options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="EnergyStore"
+        component={EnergyStoreScreen}
+        options={{ title: "Energy Store" }}
       />
       <RootStack.Screen
         name="LoginModalScreen"

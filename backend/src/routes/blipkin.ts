@@ -36,9 +36,30 @@ async function applyStatDegradation(blipkinId: string, userId: string) {
   if (hoursElapsed < 1) return blipkin;
 
   const degradedStats = degradeStats(blipkin, hoursElapsed);
+
+  // Check if feed count needs to be reset
+  const lastFeedReset = new Date(blipkin.lastFeedReset);
+  const hoursSinceReset = (now.getTime() - lastFeedReset.getTime()) / (1000 * 60 * 60);
+
+  let feedCount = blipkin.feedCount;
+  let lastFeedResetDate = blipkin.lastFeedReset;
+  let energyPenalty = 0;
+
+  if (hoursSinceReset >= 24) {
+    // New day - check if they fed 3 times yesterday
+    if (feedCount < 3) {
+      // Penalty: Drain energy faster for missing feeds
+      energyPenalty = (3 - feedCount) * 20; // -20 energy per missed feed
+    }
+    feedCount = 0;
+    lastFeedResetDate = now;
+  }
+
+  const newEnergy = Math.max(0, degradedStats.energy - energyPenalty);
   const newMood = calculateMood({
     ...blipkin,
     ...degradedStats,
+    energy: newEnergy,
   });
   const newAnimation = calculateAnimation(newMood);
 
@@ -46,11 +67,13 @@ async function applyStatDegradation(blipkinId: string, userId: string) {
     where: { userId },
     data: {
       hunger: degradedStats.hunger,
-      energy: degradedStats.energy,
+      energy: newEnergy,
       cleanliness: degradedStats.cleanliness,
       mood: newMood,
       currentAnimation: newAnimation,
       lastStatUpdate: now,
+      feedCount,
+      lastFeedReset: lastFeedResetDate,
     },
   });
 }
@@ -226,12 +249,28 @@ blipkinRouter.post("/feed", async (c) => {
   // Apply stat degradation first
   blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
 
+  // Check if feed count needs to reset (new day)
+  const now = new Date();
+  const lastFeedReset = new Date(blipkin.lastFeedReset);
+  const hoursSinceReset = (now.getTime() - lastFeedReset.getTime()) / (1000 * 60 * 60);
+
+  let currentFeedCount = blipkin.feedCount;
+  if (hoursSinceReset >= 24) {
+    // Reset feed count for new day
+    currentFeedCount = 0;
+    await db.blipkin.update({
+      where: { userId: user.id },
+      data: { feedCount: 0, lastFeedReset: now },
+    });
+  }
+
   // Calculate new stats
   const xpGained = 5;
   const bondGained = 3;
   const newHunger = Math.max(0, blipkin.hunger - 25);
   const newBond = Math.min(100, blipkin.bond + bondGained);
   const newXP = blipkin.xp + xpGained;
+  const newFeedCount = currentFeedCount + 1;
 
   // Check for level up
   const levelUpResult = calculateLevelUp(blipkin.level, newXP);
@@ -264,7 +303,8 @@ blipkinRouter.post("/feed", async (c) => {
       mood: newMood,
       currentAnimation: newAnimation,
       totalFeeds: blipkin.totalFeeds + 1,
-      lastSeenAt: new Date(),
+      feedCount: newFeedCount,
+      lastSeenAt: now,
       ...evolutionData,
     },
   });
@@ -279,7 +319,11 @@ blipkinRouter.post("/feed", async (c) => {
 
   // Generate message
   let message = "Yum! That was delicious!";
-  if (newHunger === 0) {
+  if (newFeedCount < 3) {
+    message = `Yum! That was delicious! (Fed ${newFeedCount}/3 times today)`;
+  } else if (newFeedCount === 3) {
+    message = "I've been fed 3 times today! I'm happy and healthy!";
+  } else if (newHunger === 0) {
     message = "I'm so full now! Thank you!";
   } else if (newHunger < 20) {
     message = "Mmm, that hit the spot!";
@@ -333,6 +377,52 @@ blipkinRouter.post("/play", async (c) => {
 
   // Apply stat degradation first
   blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
+
+  // Check if energy is depleted
+  if (blipkin.energy < 10) {
+    // Check if 3 hours have passed since energy depletion
+    const now = new Date();
+    const lastRestore = new Date(blipkin.lastEnergyRestore);
+    const hoursElapsed = (now.getTime() - lastRestore.getTime()) / (1000 * 60 * 60);
+
+    if (blipkin.energyRestoring && hoursElapsed >= 3) {
+      // Restore energy after 3 hours
+      await db.blipkin.update({
+        where: { userId: user.id },
+        data: {
+          energy: 100,
+          energyRestoring: false,
+          lastEnergyRestore: now,
+        },
+      });
+      blipkin.energy = 100;
+      blipkin.energyRestoring = false;
+    } else if (!blipkin.energyRestoring) {
+      // Start energy restoration
+      await db.blipkin.update({
+        where: { userId: user.id },
+        data: {
+          energyRestoring: true,
+          lastEnergyRestore: now,
+        },
+      });
+      return c.json({
+        success: false,
+        message: "Your Blipkin needs to rest! Energy will restore in 3 hours, or you can purchase energy to keep playing.",
+        needsRest: true,
+        timeUntilRestore: 3 * 60 * 60 * 1000, // 3 hours in milliseconds
+      }, 400);
+    } else {
+      // Still restoring
+      const timeLeft = (3 * 60 * 60 * 1000) - (now.getTime() - lastRestore.getTime());
+      return c.json({
+        success: false,
+        message: "Your Blipkin is resting. Energy will be restored soon!",
+        needsRest: true,
+        timeUntilRestore: timeLeft,
+      }, 400);
+    }
+  }
 
   // Calculate new stats
   const xpGained = 8;
@@ -422,6 +512,67 @@ blipkinRouter.post("/play", async (c) => {
     evolved: evolutionData.evolutionStage !== undefined,
     message,
   } satisfies PlayBlipkinResponse);
+});
+
+// ============================================
+// POST /api/blipkin/purchase-energy - Purchase Energy
+// ============================================
+blipkinRouter.post("/purchase-energy", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const body = await c.req.json();
+  const { packageId, energyAmount } = body;
+
+  if (!packageId || !energyAmount) {
+    return c.json({ message: "Missing packageId or energyAmount" }, 400);
+  }
+
+  // Find Blipkin
+  const blipkin = await db.blipkin.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!blipkin) {
+    return c.json({ message: "Blipkin not found" }, 404);
+  }
+
+  // Add energy to Blipkin
+  const newEnergy = Math.min(100, blipkin.energy + energyAmount);
+
+  const updatedBlipkin = await db.blipkin.update({
+    where: { userId: user.id },
+    data: {
+      energy: newEnergy,
+      energyRestoring: false, // Cancel any ongoing restoration
+      lastEnergyRestore: new Date(),
+    },
+  });
+
+  return c.json({
+    success: true,
+    blipkin: {
+      id: updatedBlipkin.id,
+      name: updatedBlipkin.name,
+      level: updatedBlipkin.level,
+      xp: updatedBlipkin.xp,
+      evolutionStage: updatedBlipkin.evolutionStage,
+      megaForm: updatedBlipkin.megaForm,
+      mood: updatedBlipkin.mood,
+      energy: updatedBlipkin.energy,
+      hunger: updatedBlipkin.hunger,
+      cleanliness: updatedBlipkin.cleanliness,
+      bond: updatedBlipkin.bond,
+      currentAnimation: updatedBlipkin.currentAnimation,
+      theme: updatedBlipkin.theme,
+      lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
+      createdAt: updatedBlipkin.createdAt.toISOString(),
+      updatedAt: updatedBlipkin.updatedAt.toISOString(),
+    },
+    message: `Added ${energyAmount} energy!`,
+  });
 });
 
 // ============================================

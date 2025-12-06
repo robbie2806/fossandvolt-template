@@ -164,10 +164,16 @@ model Blipkin {
 
   // Stats
   mood          String @default("Happy") // "Happy", "Sleepy", "Lonely", "Excited", "Hungry", "Content", "Joyful", "Sick", "Frustrated", "Playful"
-  energy        Int    @default(80)
+  energy        Int    @default(100)
   hunger        Int    @default(30)
   cleanliness   Int    @default(100) // New stat for evolution
   bond          Int    @default(50)
+
+  // Energy System
+  lastEnergyRestore DateTime @default(now()) // When energy was last restored (for 3-hour timer)
+  energyRestoring   Boolean  @default(false)  // Is energy currently regenerating?
+  feedCount         Int      @default(0)      // Feeds today (resets daily)
+  lastFeedReset     DateTime @default(now())  // Last time feed count was reset
 
   // Care History (for mega form evolution)
   totalFeeds    Int @default(0)
