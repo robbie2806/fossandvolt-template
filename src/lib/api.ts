@@ -21,7 +21,7 @@ import { authClient } from "./authClient";
  */
 const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
 if (!BACKEND_URL) {
-  throw new Error("Backend URL setup has failed. Please contact support@vibecodeapp.com for help.");
+  console.log("[api.ts] Warning: Backend URL not configured. API calls will fail.");
 }
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

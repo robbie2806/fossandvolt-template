@@ -35,14 +35,14 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
               await api.get("/api/companion");
               hasCompanion = true;
             } catch (error) {
-              // No companion
+              console.log("[OnboardingWelcome] No companion found:", error);
             }
 
             try {
               await api.get("/api/blipkin");
               hasBlipkin = true;
             } catch (error) {
-              // No Blipkin
+              console.log("[OnboardingWelcome] No Blipkin found:", error);
             }
 
             if (!isActive) return;
@@ -62,7 +62,7 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
             // If they have neither, stay on welcome screen
           }
         } catch (error) {
-          console.error("Auth check error:", error);
+          console.log("[OnboardingWelcome] Auth check error:", error);
         } finally {
           if (isActive) {
             setIsChecking(false);
