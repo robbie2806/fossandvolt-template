@@ -91,6 +91,58 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
       return c.json({ message: "Blipkin not found. Complete PixieVolt onboarding first." }, 404);
     }
 
+    // Check if Blipkin is sleeping
+    const now = new Date();
+    if (blipkin.sleepUntil && new Date(blipkin.sleepUntil) > now) {
+      const sleepTimeRemaining = new Date(blipkin.sleepUntil).getTime() - now.getTime();
+      return c.json({
+        message: "Your Blipkin is sleeping",
+        sleeping: true,
+        sleepUntil: blipkin.sleepUntil,
+        timeRemaining: sleepTimeRemaining
+      }, 400);
+    }
+
+    // Reset chat count if it's a new day
+    const lastChatReset = new Date(blipkin.lastChatReset);
+    const hoursSinceReset = (now.getTime() - lastChatReset.getTime()) / (1000 * 60 * 60);
+
+    let currentChatCount = blipkin.chatMessagesToday;
+    if (hoursSinceReset >= 24) {
+      // New day - reset counter
+      currentChatCount = 0;
+      await db.blipkin.update({
+        where: { userId: user.id },
+        data: { chatMessagesToday: 0, lastChatReset: now },
+      });
+    }
+
+    // Check if user has premium subscription
+    const hasPremium = false; // TODO: Check RevenueCat entitlement
+
+    // Check chat limit for non-premium users
+    if (!hasPremium && currentChatCount >= 10) {
+      // Put Blipkin to sleep for 1 hour
+      const sleepUntil = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+      await db.blipkin.update({
+        where: { userId: user.id },
+        data: { sleepUntil },
+      });
+
+      return c.json({
+        message: "Chat limit reached",
+        limitReached: true,
+        showPaywall: true,
+        sleepUntil: sleepUntil.toISOString(),
+      }, 429);
+    }
+
+    // Increment chat counter
+    await db.blipkin.update({
+      where: { userId: user.id },
+      data: { chatMessagesToday: currentChatCount + 1 },
+    });
+
     // Generate Blipkin response
     aiResponseText = await generateBlipkinResponse({
       blipkinName: blipkin.name,

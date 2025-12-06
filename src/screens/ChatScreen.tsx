@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +16,7 @@ import { Send, Sparkles, ArrowLeft } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type { GetChatHistoryResponse, GetCompanionResponse, GetBlipkinResponse, SendChatMessageResponse } from "@/shared/contracts";
+import SubscriptionPaywallModal from "./SubscriptionPaywallScreen";
 
 type Props = BottomTabScreenProps<"ChatTab">;
 
@@ -27,6 +29,7 @@ type Message = {
 
 const ChatScreen = ({ navigation, route }: Props) => {
   const [inputText, setInputText] = useState("");
+  const [showPaywall, setShowPaywall] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
@@ -51,6 +54,30 @@ const ChatScreen = ({ navigation, route }: Props) => {
       queryClient.invalidateQueries({ queryKey: ["chat"] });
       queryClient.invalidateQueries({ queryKey: ["blipkin"] });
       setInputText("");
+    },
+    onError: (error: any) => {
+      // Check if this is a chat limit error
+      try {
+        const errorData = JSON.parse(error.message);
+        if (errorData.limitReached || errorData.showPaywall) {
+          setShowPaywall(true);
+        } else if (errorData.sleeping) {
+          Alert.alert(
+            "Blipkin is Sleeping 😴",
+            "Your Blipkin is resting right now. Please try again later!",
+            [{ text: "OK" }]
+          );
+        } else {
+          Alert.alert("Error", error.message || "Failed to send message");
+        }
+      } catch {
+        // If it's a 429 status, show paywall
+        if (error.message.includes("429") || error.message.includes("limit")) {
+          setShowPaywall(true);
+        } else {
+          Alert.alert("Error", error.message || "Failed to send message");
+        }
+      }
     },
   });
 
@@ -180,6 +207,16 @@ const ChatScreen = ({ navigation, route }: Props) => {
           </View>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Subscription Paywall Modal */}
+      <SubscriptionPaywallModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribe={() => {
+          queryClient.invalidateQueries({ queryKey: ["blipkin"] });
+          Alert.alert("Success!", "You now have unlimited chat!");
+        }}
+      />
     </View>
   );
 };

@@ -175,6 +175,11 @@ model Blipkin {
   feedCount         Int      @default(0)      // Feeds today (resets daily)
   lastFeedReset     DateTime @default(now())  // Last time feed count was reset
 
+  // Chat Limit System (for subscription paywall)
+  chatMessagesToday     Int      @default(0)      // Chat messages sent today
+  lastChatReset         DateTime @default(now())  // Last time chat count was reset
+  sleepUntil            DateTime? // When the Blipkin will wake up (null if not sleeping)
+
   // Care History (for mega form evolution)
   totalFeeds    Int @default(0)
   totalPlays    Int @default(0)

@@ -377,6 +377,16 @@ Before distributing to testers, verify:
 
 ## Recent Changes
 
+### Premium Subscription & Chat Limit System (Dec 6, 2025)
+- **NEW**: $5.99/month Premium subscription for unlimited chat
+- **NEW**: Chat limit system - 10 free messages per day with Blipkin
+- **NEW**: Beautiful subscription paywall modal after 10 messages
+- **NEW**: 1-hour sleep penalty for non-subscribers who hit limit
+- **NEW**: Premium members get unlimited chat with no restrictions
+- **IMPROVED**: RevenueCat entitlement system for subscription management
+- **DATABASE**: Added chatMessagesToday, lastChatReset, and sleepUntil fields to Blipkin model
+- **BACKEND**: Chat route now checks subscription status and enforces limits
+
 ### Energy Store Crash Fix (Dec 6, 2025)
 - **FIXED**: App no longer crashes when trying to purchase energy
 - **IMPROVED**: Energy Store now uses safe RevenueCat wrapper instead of direct SDK calls
