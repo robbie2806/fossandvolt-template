@@ -2,7 +2,7 @@
   "expo": {
     "name": "PixieVolt AI",
     "slug": "pixievolt-ai",
-    "scheme": "pixievolt-ai",
+    "scheme": "com.vibecode.pixievolt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/other-1765033661811.png",

@@ -18,51 +18,69 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
       let isActive = true;
 
       async function checkAuthStatus() {
-        // Small delay to ensure navigation context is ready
-        await new Promise(resolve => setTimeout(resolve, 100));
-
         try {
-          const session = await authClient.getSession();
+          // Set a 5 second timeout for the entire check
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Auth check timeout')), 5000)
+          );
 
-          if (!isActive) return;
+          const checkPromise = (async () => {
+            // Small delay to ensure navigation context is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-          if (session?.data?.user) {
-            // User is logged in, check if they have a companion AND Blipkin
-            let hasCompanion = false;
-            let hasBlipkin = false;
-
-            try {
-              await api.get("/api/companion");
-              hasCompanion = true;
-            } catch (error) {
-              console.log("[OnboardingWelcome] No companion found:", error);
-            }
-
-            try {
-              await api.get("/api/blipkin");
-              hasBlipkin = true;
-            } catch (error) {
-              console.log("[OnboardingWelcome] No Blipkin found:", error);
-            }
+            const session = await authClient.getSession();
 
             if (!isActive) return;
 
-            // If they have both, go to tabs
-            if (hasCompanion && hasBlipkin) {
-              navigation.replace("Tabs");
-              return;
-            }
+            if (session?.data?.user) {
+              console.log("[OnboardingWelcome] User logged in, checking companion/Blipkin...");
+              // User is logged in, check if they have a companion AND Blipkin
+              let hasCompanion = false;
+              let hasBlipkin = false;
 
-            // If they have companion but no Blipkin, show PixieVolt onboarding
-            if (hasCompanion && !hasBlipkin) {
-              navigation.replace("PixieVoltIntro");
-              return;
-            }
+              try {
+                await api.get("/api/companion");
+                hasCompanion = true;
+                console.log("[OnboardingWelcome] Companion found");
+              } catch (error) {
+                console.log("[OnboardingWelcome] No companion found");
+              }
 
-            // If they have neither, stay on welcome screen
-          }
+              try {
+                await api.get("/api/blipkin");
+                hasBlipkin = true;
+                console.log("[OnboardingWelcome] Blipkin found");
+              } catch (error) {
+                console.log("[OnboardingWelcome] No Blipkin found");
+              }
+
+              if (!isActive) return;
+
+              // If they have both, go to tabs
+              if (hasCompanion && hasBlipkin) {
+                console.log("[OnboardingWelcome] Navigating to Tabs");
+                navigation.replace("Tabs");
+                return;
+              }
+
+              // If they have companion but no Blipkin, show PixieVolt onboarding
+              if (hasCompanion && !hasBlipkin) {
+                console.log("[OnboardingWelcome] Navigating to PixieVoltIntro");
+                navigation.replace("PixieVoltIntro");
+                return;
+              }
+
+              console.log("[OnboardingWelcome] Staying on welcome screen");
+              // If they have neither, stay on welcome screen
+            } else {
+              console.log("[OnboardingWelcome] No user session found");
+            }
+          })();
+
+          await Promise.race([checkPromise, timeoutPromise]);
         } catch (error) {
-          console.log("[OnboardingWelcome] Auth check error:", error);
+          console.error("[OnboardingWelcome] Auth check failed:", error);
+          // On error or timeout, show the welcome screen anyway
         } finally {
           if (isActive) {
             setIsChecking(false);

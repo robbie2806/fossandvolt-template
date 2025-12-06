@@ -10,7 +10,7 @@ export const authClient = createAuthClient({
   plugins: [
     emailOTPClient(),
     expoClient({
-      scheme: "pixievolt-ai",
+      scheme: "com.vibecode.pixievolt",
       storagePrefix: process.env.EXPO_PUBLIC_VIBECODE_PROJECT_ID as string,
       storage,
     }),

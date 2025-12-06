@@ -1,3 +1,15 @@
+## Recent Changes (2025-12-06)
+
+### Bug Fixes
+- **Fixed TestFlight Splash Screen Issue**: Added 5-second timeout to auth check on OnboardingWelcomeScreen to prevent app from hanging on splash/loading screen
+- **Fixed URI Scheme Warning**: Updated app.json and authClient.ts to use `com.vibecode.pixievolt` scheme instead of `pixievolt-ai` to match bundle identifier
+- **Enhanced Error Handling**: Added comprehensive error logging and timeout protection for initial auth/companion/blipkin checks
+- **Improved Loading Experience**: Auth check now fails gracefully if backend is unreachable, showing welcome screen instead of hanging
+
+These changes should fix the issue where the TestFlight build was stuck on the loading screen. The app now has proper timeout protection and will show the welcome screen even if the backend is slow or unreachable.
+
+---
+
 # PixieVolt AI - Your Personal AI Companion with BlipNet
 
 PixieVolt AI (formerly BondNode) is a Tamagotchi-style AI companion app that grows with you through daily interactions, check-ins, and meaningful conversations. Build your bond level, care for your evolving Blipkin pet, explore BlipNet online features, and enjoy a personalized AI experience designed for fun, motivation, and life organization.
