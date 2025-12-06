@@ -66,7 +66,7 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
 
   try {
     const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
+    const apiKey = process.env.CODEX_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
       `${baseUrl}/chat/completions`,
@@ -74,7 +74,7 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -134,7 +134,7 @@ Respond with a supportive, personalized message (1-2 sentences) that:
 
   try {
     const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
+    const apiKey = process.env.CODEX_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
       `${baseUrl}/chat/completions`,
@@ -142,7 +142,7 @@ Respond with a supportive, personalized message (1-2 sentences) that:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -231,7 +231,7 @@ Remember: You're a companion, not a tool. Be playful, warm, and genuine!`;
 
   try {
     const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
+    const apiKey = process.env.CODEX_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
       `${baseUrl}/chat/completions`,
@@ -239,7 +239,7 @@ Remember: You're a companion, not a tool. Be playful, warm, and genuine!`;
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
