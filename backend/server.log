@@ -254,3 +254,17 @@ error: No text in response
 --> POST /api/blipkin/play [32m200[0m 4ms
 <-- GET /api/blipkin
 --> GET /api/blipkin [32m200[0m 2ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 14ms
+<-- GET /api/companion
+--> GET /api/companion [32m200[0m 26ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 5ms
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 2ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 25ms
+<-- GET /api/blipkin
+<-- GET /api/chat
+--> GET /api/chat [32m200[0m 10ms
+--> GET /api/blipkin [32m200[0m 13ms
