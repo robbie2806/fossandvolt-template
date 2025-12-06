@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 136ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 128ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 769 installs across 711 packages (no changes) [1471.00ms]
+Checked 769 installs across 711 packages (no changes) [1426.00ms]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -48,10 +48,6 @@ Failed to find Response internal state key
   💚 Health:     GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- POST /api/chat
-[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
-[AI] Blipkin - API key from CODEX_API_KEY: true
-[AI] Blipkin - Final API key present: true Length: 48
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔐 [Auth] Initializing Better Auth...
@@ -83,18 +79,13 @@ Failed to find Response internal state key
   💚 Health:     GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
---> POST /api/chat [32m200[0m 1s
-<-- GET /api/chat
---> GET /api/chat [32m200[0m 23ms
-<-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 11ms
 <-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 7ms
+--> GET /api/auth/get-session [32m200[0m 11ms
 <-- GET /api/companion
---> GET /api/companion [32m200[0m 2ms
+--> GET /api/companion [32m200[0m 3ms
 <-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 2ms
+--> GET /api/blipkin [32m200[0m 8ms
 <-- GET /api/chat
+--> GET /api/chat [32m200[0m 3ms
 <-- GET /api/blipkin
---> GET /api/chat [32m200[0m 4ms
---> GET /api/blipkin [32m200[0m 6ms
+--> GET /api/blipkin [32m200[0m 3ms
