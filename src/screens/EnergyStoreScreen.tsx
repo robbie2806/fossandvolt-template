@@ -38,7 +38,7 @@ const ENERGY_PACKAGES = [
     id: "emergency",
     lookupKey: "$rc_custom_emergency",
     energy: 100,
-    price: "$2.99",
+    price: "$15.99",
     label: "Emergency Restore",
     color: "#EF4444",
   },
