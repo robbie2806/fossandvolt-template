@@ -1,37 +1,47 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
-import type { CreateCompanionResponse } from "@/shared/contracts";
+import type { CreateCompanionResponse, CreateBlipkinResponse } from "@/shared/contracts";
 
 type Props = RootStackScreenProps<"OnboardingName">;
 
 const OnboardingNameScreen = ({ navigation }: Props) => {
-  const [aiName, setAiName] = useState("Nova");
+  const [blipkinName, setBlipkinName] = useState("");
+  const queryClient = useQueryClient();
 
-  const createCompanionMutation = useMutation({
+  const createBlipkinMutation = useMutation({
     mutationFn: async () => {
-      if (!aiName.trim()) throw new Error("Name is required");
-      return api.post<CreateCompanionResponse>("/api/companion", {
-        name: aiName.trim(),
-        vibe: "chill", // Default vibe
+      if (!blipkinName.trim()) throw new Error("Name is required");
+
+      // Create companion first (backend requirement)
+      await api.post<CreateCompanionResponse>("/api/companion", {
+        name: blipkinName.trim(),
+        vibe: "chill",
+      });
+
+      // Then create Blipkin with same name
+      return api.post<CreateBlipkinResponse>("/api/blipkin", {
+        name: blipkinName.trim(),
       });
     },
     onSuccess: () => {
-      // After creating companion, go to PixieVolt onboarding
-      navigation.navigate("PixieVoltIntro");
+      queryClient.invalidateQueries({ queryKey: ["companion"] });
+      queryClient.invalidateQueries({ queryKey: ["blipkin"] });
+      // Go straight to tabs
+      navigation.replace("Tabs");
     },
     onError: (error: any) => {
-      console.error("Failed to create companion:", error);
-      alert("Failed to create your AI companion. Please try again.");
+      console.error("Failed to create Blipkin:", error);
+      alert("Failed to create your Blipkin. Please try again.");
     },
   });
 
   const handleContinue = () => {
-    if (aiName.trim()) {
-      createCompanionMutation.mutate();
+    if (blipkinName.trim()) {
+      createBlipkinMutation.mutate();
     }
   };
 
@@ -66,15 +76,15 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
           {/* Input */}
           <View className="w-full mb-8">
             <TextInput
-              value={aiName}
-              onChangeText={setAiName}
+              value={blipkinName}
+              onChangeText={setBlipkinName}
               placeholder="Enter name..."
               placeholderTextColor="rgba(255,255,255,0.5)"
               className="bg-white/20 text-white text-2xl font-semibold rounded-2xl px-6 py-4 text-center"
               autoFocus
               maxLength={20}
               onSubmitEditing={handleContinue}
-              editable={!createCompanionMutation.isPending}
+              editable={!createBlipkinMutation.isPending}
             />
             <Text className="text-white/60 text-sm text-center mt-3">
               You can change this later in settings
@@ -84,15 +94,15 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
           {/* Continue Button */}
           <Pressable
             onPress={handleContinue}
-            disabled={!aiName.trim() || createCompanionMutation.isPending}
-            className={`rounded-2xl px-12 py-4 shadow-lg ${aiName.trim() && !createCompanionMutation.isPending ? "bg-white active:scale-95" : "bg-white/30"}`}
+            disabled={!blipkinName.trim() || createBlipkinMutation.isPending}
+            className={`rounded-2xl px-12 py-4 shadow-lg ${blipkinName.trim() && !createBlipkinMutation.isPending ? "bg-white active:scale-95" : "bg-white/30"}`}
             style={{ transform: [{ scale: 1 }] }}
           >
-            {createCompanionMutation.isPending ? (
+            {createBlipkinMutation.isPending ? (
               <ActivityIndicator color="#8B5CF6" />
             ) : (
               <Text
-                className={`text-xl font-semibold ${aiName.trim() ? "text-purple-600" : "text-white/50"}`}
+                className={`text-xl font-semibold ${blipkinName.trim() ? "text-purple-600" : "text-white/50"}`}
               >
                 Continue
               </Text>
