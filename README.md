@@ -61,6 +61,25 @@ If you're in crisis or need professional help, please contact emergency services
 - Chat history persists across sessions
 - Memory-enabled responses (can be toggled in settings)
 - **Blipkin Chat Mode**: Talk directly to your Blipkin with personality-driven responses
+- **Premium Subscription System**: Free users get 10 chat messages per day
+- **Chat Limit Paywall**: After 10 messages, free users see subscription paywall
+- **Sleep Penalty**: Declining subscription puts Blipkin to sleep for 1 hour
+- **Premium Benefits**: $5.99/month for unlimited chat, no sleep penalties, faster leveling
+
+### 💰 Energy & Monetization System
+- **Energy Store**: Purchase energy packages to prevent sleep penalties
+  - **Quick Boost**: $2.99 for 5 energy (prevents 6hr sleep)
+  - **Small Package**: $2.99 for 30 energy
+  - **Medium Package**: $4.99 for 60 energy (20% bonus)
+  - **Large Package**: $10.99 for 150 energy (30% bonus)
+  - **Full Energy Restore**: $15.99 for 100 energy (instant full restore)
+- **Premium Subscription**: $5.99/month
+  - Unlimited chat messages
+  - No sleep penalties
+  - Level up faster
+  - Support development
+- **RevenueCat Integration**: Safe wrapper handles missing configuration gracefully
+- **Entitlements**: "premium" entitlement for subscription features
 
 ### 🎯 Bond System
 - **Daily Check-in** (+20 XP): Share your mood and reflections
