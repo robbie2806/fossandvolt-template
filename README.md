@@ -425,7 +425,8 @@ Before distributing to testers, verify:
   - Small Energy Bundle: 30 energy for $2.99 AUD
   - Medium Energy Bundle: 60 energy for $4.99 AUD (20% bonus value)
   - Large Energy Bundle: 150 energy for $10.99 AUD (30% bonus value!)
-  - Emergency Restore: Full energy for $15.99 AUD
+  - Quick Boost: 5 energy for $2.99 AUD (prevents 6hr sleep penalty)
+  - Full Energy Restore: 100 energy for $15.99 AUD (instant full restore!)
 - **NEW**: 3x Daily Feeding Requirement
   - Feed your Blipkin 3 times per day
   - Missing feeds = faster energy drain (-20 energy per missed feed)

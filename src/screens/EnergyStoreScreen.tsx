@@ -37,9 +37,19 @@ const ENERGY_PACKAGES = [
   {
     id: "emergency",
     lookupKey: "$rc_custom_emergency",
+    energy: 5,
+    price: "$2.99",
+    label: "Quick Boost",
+    description: "Prevents 6hr sleep",
+    color: "#F97316",
+  },
+  {
+    id: "full_restore",
+    lookupKey: "$rc_custom_full_restore",
     energy: 100,
     price: "$15.99",
-    label: "Emergency Restore",
+    label: "Full Energy Restore",
+    description: "Instant full energy!",
     color: "#EF4444",
   },
 ];
@@ -204,8 +214,7 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
         <View className="gap-4">
           {ENERGY_PACKAGES.map((pkg) => {
             const rcPackage = packages[pkg.lookupKey];
-            // For emergency package, always use our price instead of RevenueCat's price
-            const displayPrice = pkg.id === "emergency" ? pkg.price : (rcPackage?.product.priceString || pkg.price);
+            const displayPrice = rcPackage?.product.priceString || pkg.price;
 
             return (
               <Pressable
@@ -233,6 +242,11 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
                             {pkg.bonus}
                           </Text>
                         )}
+                        {pkg.description && (
+                          <Text className="text-gray-500 text-sm">
+                            {pkg.description}
+                          </Text>
+                        )}
                       </View>
                     </View>
                     <View>
@@ -241,7 +255,7 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
                     </View>
                   </View>
 
-                  {pkg.id === "emergency" && (
+                  {pkg.id === "full_restore" && (
                     <View className="bg-red-50 rounded-lg p-3 mt-2">
                       <Text className="text-red-900 text-sm font-medium text-center">
                         ⚡ Instantly restores full energy!
