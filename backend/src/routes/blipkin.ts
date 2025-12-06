@@ -269,6 +269,14 @@ blipkinRouter.post("/feed", async (c) => {
     },
   });
 
+  // Award coins for feeding
+  const coinsEarned = 10;
+  await db.currencyWallet.upsert({
+    where: { userId: user.id },
+    update: { coins: { increment: coinsEarned } },
+    create: { userId: user.id, coins: coinsEarned, voltGems: 0 },
+  });
+
   // Generate message
   let message = "Yum! That was delicious!";
   if (newHunger === 0) {
@@ -299,6 +307,7 @@ blipkinRouter.post("/feed", async (c) => {
     },
     xpGained,
     bondGained,
+    coinsEarned,
     leveledUp: levelUpResult.didLevelUp,
     evolved: evolutionData.evolutionStage !== undefined,
     message,
@@ -370,6 +379,14 @@ blipkinRouter.post("/play", async (c) => {
     },
   });
 
+  // Award coins for playing
+  const coinsEarned = 15;
+  await db.currencyWallet.upsert({
+    where: { userId: user.id },
+    update: { coins: { increment: coinsEarned } },
+    create: { userId: user.id, coins: coinsEarned, voltGems: 0 },
+  });
+
   // Generate message
   let message = "That was so much fun!";
   if (newEnergy < 20) {
@@ -400,6 +417,7 @@ blipkinRouter.post("/play", async (c) => {
     },
     xpGained,
     bondGained,
+    coinsEarned,
     leveledUp: levelUpResult.didLevelUp,
     evolved: evolutionData.evolutionStage !== undefined,
     message,
@@ -469,6 +487,14 @@ blipkinRouter.post("/clean", async (c) => {
     },
   });
 
+  // Award coins for cleaning
+  const coinsEarned = 8;
+  await db.currencyWallet.upsert({
+    where: { userId: user.id },
+    update: { coins: { increment: coinsEarned } },
+    create: { userId: user.id, coins: coinsEarned, voltGems: 0 },
+  });
+
   // Generate message
   let message = "All sparkly clean! ✨";
   if (newCleanliness === 100) {
@@ -499,6 +525,7 @@ blipkinRouter.post("/clean", async (c) => {
     },
     xpGained,
     bondGained,
+    coinsEarned,
     leveledUp: levelUpResult.didLevelUp,
     evolved: evolutionData.evolutionStage !== undefined,
     message,
@@ -568,6 +595,14 @@ blipkinRouter.post("/rest", async (c) => {
     },
   });
 
+  // Award coins for resting
+  const coinsEarned = 5;
+  await db.currencyWallet.upsert({
+    where: { userId: user.id },
+    update: { coins: { increment: coinsEarned } },
+    create: { userId: user.id, coins: coinsEarned, voltGems: 0 },
+  });
+
   // Generate message
   let message = "Zzz... that was a nice nap!";
   if (newEnergy === 100) {
@@ -598,6 +633,7 @@ blipkinRouter.post("/rest", async (c) => {
     },
     xpGained,
     bondGained,
+    coinsEarned,
     leveledUp: levelUpResult.didLevelUp,
     evolved: evolutionData.evolutionStage !== undefined,
     message,

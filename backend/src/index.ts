@@ -11,6 +11,12 @@ import { chatRouter } from "./routes/chat";
 import { bondRouter } from "./routes/bond";
 import { settingsRouter } from "./routes/settings";
 import { blipkinRouter } from "./routes/blipkin";
+import { shopRouter } from "./routes/shop";
+import { blipnetRouter } from "./routes/blipnet";
+import { roomRouter } from "./routes/room";
+import { minigamesRouter } from "./routes/minigames";
+import { journalRouter } from "./routes/journal";
+import { eventsRouter } from "./routes/events";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -64,6 +70,24 @@ app.route("/api/settings", settingsRouter);
 
 console.log("✨ Mounting Blipkin routes at /api/blipkin");
 app.route("/api/blipkin", blipkinRouter);
+
+console.log("🛍️  Mounting Shop routes at /api/shop");
+app.route("/api/shop", shopRouter);
+
+console.log("🌐 Mounting BlipNet routes at /api/blipnet");
+app.route("/api/blipnet", blipnetRouter);
+
+console.log("🏠 Mounting Room routes at /api/room");
+app.route("/api/room", roomRouter);
+
+console.log("🎮 Mounting MiniGames routes at /api/minigames");
+app.route("/api/minigames", minigamesRouter);
+
+console.log("📔 Mounting Journal routes at /api/journal");
+app.route("/api/journal", journalRouter);
+
+console.log("🎪 Mounting Events routes at /api/events");
+app.route("/api/events", eventsRouter);
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running

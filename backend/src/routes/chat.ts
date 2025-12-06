@@ -130,6 +130,13 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
         lastSeenAt: new Date(),
       },
     });
+
+    // Award coins for chatting with Blipkin
+    await db.currencyWallet.upsert({
+      where: { userId: user.id },
+      update: { coins: { increment: 5 } },
+      create: { userId: user.id, coins: 5, voltGems: 0 },
+    });
   } else {
     // Generate regular companion response
     aiResponseText = await generateAIResponse({

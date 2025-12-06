@@ -29,6 +29,13 @@ model User {
   settings      UserSettings?
   blipkin       Blipkin?
 
+  // BlipNet Relations
+  currencyWallet CurrencyWallet?
+  inventoryItems InventoryItem[]
+  blipkinRoom    BlipkinRoom?
+  miniGameResults MiniGameResult[]
+  journalEntries BlipkinJournalEntry[]
+
   @@map("user")
 }
 
@@ -179,6 +186,176 @@ model Blipkin {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  // BlipNet Relations
+  presence BlipnetPresence?
+  journalEntries BlipkinJournalEntry[]
+  miniGameResults MiniGameResult[]
+
   @@map("blipkin")
 }
 
+// BlipNet - Online Presence (Offline-first, ready for real-time sync)
+model BlipnetPresence {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  blipkinId  String   @unique
+  blipkin    Blipkin  @relation(fields: [blipkinId], references: [id], onDelete: Cascade)
+
+  // Position in lobby grid
+  lastLocationX Int @default(5)
+  lastLocationY Int @default(5)
+
+  // Movement & animation
+  lastDirection String @default("down") // "up", "down", "left", "right"
+  lastAction    String @default("idle") // "idle", "walking", "wave", "bounce", "spin", "emote_heart", etc
+
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("blipnet_presence")
+}
+
+// Currency Wallet
+model CurrencyWallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  coins     Int @default(0)
+  voltGems  Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("currency_wallet")
+}
+
+// Shop Items Catalog
+model ShopItem {
+  id          String  @id @default(cuid())
+  key         String  @unique // Unique identifier like "apple", "toy_ball", etc
+  name        String
+  description String
+  category    String  // "FOOD", "TOY", "DECOR", "ACCESSORY", "ROOM_ITEM", "BOOST"
+
+  priceCoins    Int
+  priceVoltGems Int? // Optional premium currency
+
+  iconKey      String // Frontend uses this to pick sprite/emoji
+  effectType   String // "FEED", "MOOD_BOOST", "XP_BOOST", "ROOM_DECOR", "COSMETIC"
+  effectValue  Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  inventoryItems InventoryItem[]
+  roomFurniture RoomFurniture[]
+
+  @@map("shop_item")
+}
+
+// User Inventory
+model InventoryItem {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  shopItemId String
+  shopItem   ShopItem @relation(fields: [shopItemId], references: [id])
+
+  quantity   Int @default(1)
+
+  obtainedAt DateTime @default(now())
+
+  @@map("inventory_item")
+}
+
+// Personal Room
+model BlipkinRoom {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name         String   @default("My Room")
+  wallpaperKey String   @default("default")
+  floorKey     String   @default("wood")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  furniture RoomFurniture[]
+
+  @@map("blipkin_room")
+}
+
+// Room Furniture Placement
+model RoomFurniture {
+  id         String   @id @default(cuid())
+  roomId     String
+  room       BlipkinRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  shopItemId String
+  shopItem   ShopItem @relation(fields: [shopItemId], references: [id])
+
+  posX       Int
+  posY       Int
+  rotation   Int @default(0) // 0, 90, 180, 270
+
+  createdAt DateTime @default(now())
+
+  @@map("room_furniture")
+}
+
+// Mini-Game Results
+model MiniGameResult {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  blipkinId  String
+  blipkin    Blipkin  @relation(fields: [blipkinId], references: [id], onDelete: Cascade)
+
+  gameType   String   // "FRUIT_CATCH", "BUBBLE_POP", "FISHING", "MEMORY", "DASH"
+  score      Int
+  coinsEarned Int     @default(0)
+  xpEarned   Int      @default(0)
+
+  createdAt  DateTime @default(now())
+
+  @@map("mini_game_result")
+}
+
+// Blipkin Journal Entries
+model BlipkinJournalEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  blipkinId  String
+  blipkin    Blipkin  @relation(fields: [blipkinId], references: [id], onDelete: Cascade)
+
+  title      String
+  body       String
+  moodTag    String   // "HAPPY", "SAD", "TIRED", "EXCITED", "CALM", "CHAOTIC"
+
+  createdAt  DateTime @default(now())
+
+  @@map("blipkin_journal_entry")
+}
+
+// Global Events
+model GlobalEventState {
+  id         String   @id @default(cuid())
+  eventKey   String   @unique // "FEEDING_FRENZY", "HAPPINESS_WEEK", etc
+  isActive   Boolean  @default(false)
+
+  startsAt   DateTime
+  endsAt     DateTime
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("global_event_state")
+}

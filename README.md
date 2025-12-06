@@ -1,6 +1,6 @@
-# PixieVolt AI - Your Personal AI Companion
+# PixieVolt AI - Your Personal AI Companion with BlipNet
 
-PixieVolt AI (formerly BondNode) is a Tamagotchi-style AI companion app that grows with you through daily interactions, check-ins, and meaningful conversations. Build your bond level, care for your Blipkin pet, set goals, and enjoy a personalized AI experience designed for fun, motivation, and life organization.
+PixieVolt AI (formerly BondNode) is a Tamagotchi-style AI companion app that grows with you through daily interactions, check-ins, and meaningful conversations. Build your bond level, care for your evolving Blipkin pet, explore BlipNet online features, and enjoy a personalized AI experience designed for fun, motivation, and life organization.
 
 ## What is PixieVolt AI?
 
@@ -9,20 +9,37 @@ PixieVolt AI is **NOT** a therapist, doctor, or medical service. It's a fun, sup
 - Reflective conversations
 - Goal setting and organization
 - Entertainment and personal growth
+- Digital pet care and evolution
 
 If you're in crisis or need professional help, please contact emergency services or a qualified professional.
 
 ## Features
 
-### ✨ PixieVolt AI - Blipkin Pet System
-- Name and care for your own digital companion called a Blipkin
-- **Feed** your Blipkin to reduce hunger and increase bond
-- **Play** with your Blipkin to earn XP and strengthen your connection
-- **Chat** with your Blipkin in a special chat mode with unique personality
-- Watch your Blipkin level up from 1 to ∞ through interactions
-- Monitor Blipkin stats: Level, XP, Mood, Energy, Hunger, and Bond
-- Mood system that responds to your Blipkin&apos;s needs (Happy, Sleepy, Hungry, Joyful, etc.)
-- Miss-you notifications when you haven&apos;t visited in 24+ hours
+### ✨ PixieVolt AI - Blipkin Evolution System
+- **6 Evolution Stages**: Baby → Child → Teen → Adult → Mega → Elder
+- **4 Mega Forms**: Your care style determines your Mega form (Nurturer, Explorer, Chaos, Calm)
+- **Care Actions**: Feed, Play, Clean, and Rest your Blipkin
+- **Stat System**: Monitor Hunger, Energy, Cleanliness, and Bond
+- **Stat Degradation**: Stats naturally decrease over time (hunger +5/hr, energy -3/hr, cleanliness -2/hr)
+- **Leveling System**: Level up through care and earn XP
+- **Mood System**: Dynamic moods based on stats (Happy, Sleepy, Hungry, Joyful, Sick, etc.)
+- **Personality Engine**: Blipkin develops unique personality based on your care history
+- **Evolution Requirements**: Level milestones trigger evolution to next stage
+- **Mega Form Selection**: Based on your total care actions and ratios
+
+### 🌐 BlipNet - Online System (Backend Complete)
+- **Shop System**: Buy items with coins (food, toys, room decorations, boosts)
+- **Currency**: Earn coins from all Blipkin actions (feed +10, play +15, clean +8, rest +5, chat +5)
+- **VoltGems**: Optional premium currency for special items
+- **Inventory Management**: Track owned items with quantities
+- **Personal Room**: Decorate your Blipkin's room with furniture
+- **Room Customization**: Place furniture, change wallpaper and flooring
+- **Mini-Games**: Play games to earn coins and XP (Fruit Catch, Bubble Pop, and more)
+- **Journal System**: AI-generated daily journal entries from your Blipkin's perspective
+- **Personality Profiles**: 5 traits (energy, curiosity, sociability, carefulness, affection)
+- **Global Events**: Weekly events with bonus multipliers (2x XP, 2x coins, etc.)
+- **BlipNet Lobby**: Real-time lobby with presence system (4-directional movement)
+- **Emotes & Interactions**: Wave, bounce, spin, and more
 
 ### 🤖 Personalized AI Companion
 - Name your AI companion during onboarding
@@ -36,6 +53,7 @@ If you're in crisis or need professional help, please contact emergency services
 - Earn 2 XP for every message
 - Chat history persists across sessions
 - Memory-enabled responses (can be toggled in settings)
+- **Blipkin Chat Mode**: Talk directly to your Blipkin with personality-driven responses
 
 ### 🎯 Bond System
 - **Daily Check-in** (+20 XP): Share your mood and reflections
@@ -147,11 +165,45 @@ model UserSettings {
 ## API Endpoints
 
 ### PixieVolt / Blipkin
-- `GET /api/blipkin` - Get user's Blipkin
+- `GET /api/blipkin` - Get user's Blipkin (includes personality, evolution check)
 - `POST /api/blipkin` - Create Blipkin (onboarding)
 - `PUT /api/blipkin` - Update Blipkin name
-- `POST /api/blipkin/feed` - Feed Blipkin action
-- `POST /api/blipkin/play` - Play with Blipkin action
+- `POST /api/blipkin/feed` - Feed Blipkin action (+10 coins)
+- `POST /api/blipkin/play` - Play with Blipkin action (+15 coins)
+- `POST /api/blipkin/clean` - Clean Blipkin action (+8 coins)
+- `POST /api/blipkin/rest` - Rest Blipkin action (+5 coins)
+
+### BlipNet - Shop System
+- `GET /api/shop/catalog` - Get wallet, shop items, and inventory
+- `POST /api/shop/buy` - Purchase item with coins or VoltGems
+
+### BlipNet - Lobby & Presence
+- `GET /api/blipnet/lobby` - Get all active Blipkins in lobby (last 5 min)
+- `POST /api/blipnet/presence` - Update own position/direction/action
+- `POST /api/blipnet/emote` - Send emote (wave, bounce, spin, etc.) (+5 coins)
+- `POST /api/blipnet/leave` - Leave lobby (set offline)
+
+### BlipNet - Personal Room
+- `GET /api/room` - Get room layout (wallpaper, floor, furniture)
+- `PATCH /api/room` - Update room settings (name, wallpaper, floor)
+- `POST /api/room/furniture` - Place furniture from inventory
+- `DELETE /api/room/furniture/:id` - Remove furniture
+- `PATCH /api/room/furniture/:id` - Move/rotate furniture
+
+### BlipNet - Mini-Games
+- `POST /api/minigames/result` - Submit game score (earn coins + XP to Blipkin)
+- `GET /api/minigames/stats` - Get user's game history and high scores
+
+### BlipNet - Journal System
+- `GET /api/journal` - Get Blipkin journal entries (last 30)
+- `POST /api/journal/generate` - Generate AI journal entry for today
+- `DELETE /api/journal/:id` - Delete journal entry
+
+### BlipNet - Global Events
+- `GET /api/events/active` - Get currently active events
+- `GET /api/events/:eventKey` - Get event details
+- `POST /api/events` - Create event (admin)
+- `PATCH /api/events/:id/toggle` - Toggle event active status (admin)
 
 ### Companion
 - `GET /api/companion` - Get user's AI companion
@@ -160,7 +212,7 @@ model UserSettings {
 
 ### Chat
 - `GET /api/chat` - Get chat history (last 100 messages)
-- `POST /api/chat` - Send message and get AI response (supports `mode: "companion"` or `mode: "blipkin"`)
+- `POST /api/chat` - Send message and get AI response (supports `mode: "companion"` or `mode: "blipkin"`, Blipkin mode awards +5 coins)
 
 ### Bond
 - `GET /api/bond` - Get bond status and today's actions
