@@ -3,12 +3,14 @@ import { emailOTPClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { storage } from "./secure-storage";
 
+const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || "https://placeholder.vibecode.app";
+
 export const authClient = createAuthClient({
-  baseURL: process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL as string,
+  baseURL: BACKEND_URL,
   plugins: [
     emailOTPClient(),
     expoClient({
-      scheme: "vibecode",
+      scheme: "pixievolt-ai",
       storagePrefix: process.env.EXPO_PUBLIC_VIBECODE_PROJECT_ID as string,
       storage,
     }),
