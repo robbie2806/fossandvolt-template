@@ -5,13 +5,40 @@
     "scheme": "pixievolt-ai",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon-1764983651645.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon-1764983651645.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8B5CF6"
+    },
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vibecode.pixievolt",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "PixieVolt AI needs access to your photo library to let you share moments with your Blipkin.",
+        "NSCameraUsageDescription": "PixieVolt AI needs camera access to capture special moments with your Blipkin.",
+        "NSUserTrackingUsageDescription": "This allows us to provide you with personalized experiences and improve the app."
+      }
     },
     "android": {
-      "edgeToEdgeEnabled": true
-    }
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-1764983651645.png",
+        "backgroundColor": "#8B5CF6"
+      },
+      "package": "com.vibecode.pixievolt"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "019ac803-4cd2-71dc-9e67-88b2838ceaf1"
+      }
+    },
+    "owner": "vibecode"
   }
 }

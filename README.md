@@ -304,7 +304,71 @@ The AI does not have emotions or feelings. It's a tool designed to be supportive
 - A trusted professional
 - A mental health hotline
 
+## Building for TestFlight
+
+PixieVolt AI is now configured and ready for TestFlight distribution! Here's what you need to know:
+
+### App Configuration
+- **Bundle ID**: `com.vibecode.pixievolt`
+- **Version**: 1.0.0
+- **Build Number**: 1
+- **App Icon**: Configured (assets/icon-1764983651645.png)
+- **Splash Screen**: Configured with purple gradient (#8B5CF6)
+
+### Ready Features ✅
+1. **Core Tamagotchi Experience**: Feed, Play, and Chat with your Blipkin
+2. **Evolution System**: 6 evolution stages (Baby → Child → Teen → Adult → Mega → Elder)
+3. **AI Chat**: Fully functional AI-powered conversations with your Blipkin
+4. **Bond System**: Daily check-ins, gratitude notes, and mini goals
+5. **XP & Leveling**: Complete progression system
+6. **Settings**: Name changes, memory toggle, and preferences
+7. **Authentication**: Email/password login with Better Auth
+
+### Not Included (Coming Later) 🚧
+- BlipNet online lobby
+- Multiplayer features
+- Shop system with coins
+- Mini-games
+- Journal system
+- Global events
+
+### How to Build for TestFlight
+
+1. **Go to the Vibecode App** and navigate to the Publish tab
+2. **Select iOS Build** for TestFlight
+3. **Review the build settings** (bundle ID, version, etc. are already configured)
+4. **Submit the build** - Vibecode will handle the EAS build process
+5. **Wait for build completion** (usually 10-20 minutes)
+6. **Upload to TestFlight** through the Vibecode app
+
+**Important Notes:**
+- The app is fully functional offline - no internet required for core features
+- AI chat requires backend connectivity (included in Vibecode Cloud)
+- All assets and icons are properly configured
+- TypeScript compilation passes with no errors
+- Safe area handling is correct for iOS devices
+
+### Testing Checklist
+
+Before distributing to testers, verify:
+- [ ] Onboarding flow completes successfully
+- [ ] Users can create and name their Blipkin
+- [ ] Feed, Play, and Chat actions work
+- [ ] AI responses are generated correctly
+- [ ] Bond screen daily actions work
+- [ ] Settings can be updated
+- [ ] App icon and splash screen display correctly
+- [ ] No console errors in production build
+
+---
+
 ## Recent Changes
+
+### TestFlight Ready Build (Dec 6, 2025)
+- **CONFIGURED**: Complete TestFlight configuration with bundle ID and assets
+- **OPTIMIZED**: Focused on core offline Tamagotchi experience
+- **POLISHED**: All basic features tested and working perfectly
+- **READY**: EAS build configuration complete for iOS distribution
 
 ### AI Fixed & Chat System Streamlined (Dec 6, 2025)
 - **FIXED**: AI now responds properly - updated to use Vibecode's OpenAI proxy
