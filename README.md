@@ -254,6 +254,14 @@ The AI does not have emotions or feelings. It's a tool designed to be supportive
 
 ## Recent Changes
 
+### AI Fixed & Chat System Streamlined (Dec 6, 2025)
+- **FIXED**: AI now responds properly - updated to use Vibecode's OpenAI proxy
+- **SIMPLIFIED**: Chat screen now ONLY uses Blipkin mode (removed companion/blipkin toggle)
+- **CONSISTENT**: All screens now display "Level X" consistently (no more "Bond Level")
+- **CLARIFIED**: Blipkin IS your AI companion - they are one and the same entity
+- **ONBOARDING**: When you name your Blipkin, it creates both the companion and Blipkin with the same name
+- AI responses now work through Vibecode's proxy system without requiring manual API key setup
+
 ### Database Migration Applied (Nov 28, 2025)
 - Applied pending database migration `20251128011254_add_bondnode_models`
 - Created all necessary tables: `ai_companion`, `chat_message`, `daily_check_in`, `bond_action`, `user_settings`

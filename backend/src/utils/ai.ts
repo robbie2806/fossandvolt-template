@@ -65,15 +65,16 @@ export async function generateAIResponse(params: GenerateAIResponseParams): Prom
   });
 
   try {
+    const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
     const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
-      'https://api.openai.com/v1/chat/completions',
+      `${baseUrl}/chat/completions`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -132,15 +133,16 @@ Respond with a supportive, personalized message (1-2 sentences) that:
 `;
 
   try {
+    const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
     const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
-      'https://api.openai.com/v1/chat/completions',
+      `${baseUrl}/chat/completions`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -228,15 +230,16 @@ Remember: You're a companion, not a tool. Be playful, warm, and genuine!`;
   });
 
   try {
+    const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
     const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
     const response = await fetch(
-      'https://api.openai.com/v1/chat/completions',
+      `${baseUrl}/chat/completions`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          ...(apiKey && { 'Authorization': `Bearer ${apiKey}` })
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
