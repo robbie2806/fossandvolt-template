@@ -7,7 +7,7 @@ import {
 } from "@/shared/contracts";
 import { db } from "../db";
 import { type AppType } from "../types";
-import { generateAIResponse } from "../utils/ai";
+import { generateAIResponse, generateBlipkinResponse } from "../utils/ai";
 
 const chatRouter = new Hono<AppType>();
 
@@ -45,7 +45,7 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { message } = c.req.valid("json");
+  const { message, mode = "companion" } = c.req.valid("json");
 
   // Get companion and settings
   const companion = await db.aICompanion.findUnique({
@@ -78,17 +78,71 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
       })
     : [];
 
-  // Generate AI response
-  const aiResponseText = await generateAIResponse({
-    companionName: companion.name,
-    companionVibe: companion.vibe,
-    bondLevel: companion.bondLevel,
-    userMessage: message,
-    chatHistory: recentMessages.reverse().map((msg) => ({
-      role: msg.role as "user" | "assistant",
-      content: msg.content,
-    })),
-  });
+  // Generate AI response based on mode
+  let aiResponseText: string;
+
+  if (mode === "blipkin") {
+    // Get Blipkin for Blipkin chat mode
+    const blipkin = await db.blipkin.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!blipkin) {
+      return c.json({ message: "Blipkin not found. Complete PixieVolt onboarding first." }, 404);
+    }
+
+    // Generate Blipkin response
+    aiResponseText = await generateBlipkinResponse({
+      blipkinName: blipkin.name,
+      blipkinLevel: blipkin.level,
+      blipkinMood: blipkin.mood,
+      blipkinBond: blipkin.bond,
+      blipkinEnergy: blipkin.energy,
+      blipkinHunger: blipkin.hunger,
+      userMessage: message,
+      chatHistory: recentMessages.reverse().map((msg) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      })),
+    });
+
+    // Award XP and bond to Blipkin for chatting
+    const xpGained = 3;
+    const bondGained = 2;
+    const newXP = blipkin.xp + xpGained;
+    let newLevel = blipkin.level;
+    let xpAfterLevel = newXP;
+
+    // Check for level up
+    while (xpAfterLevel >= newLevel * 100) {
+      xpAfterLevel -= newLevel * 100;
+      newLevel++;
+    }
+
+    // Update Blipkin
+    await db.blipkin.update({
+      where: { userId: user.id },
+      data: {
+        xp: xpAfterLevel,
+        level: newLevel,
+        bond: Math.min(100, blipkin.bond + bondGained),
+        lastSeenAt: new Date(),
+      },
+    });
+  } else {
+    // Generate regular companion response
+    aiResponseText = await generateAIResponse({
+      companionName: companion.name,
+      companionVibe: companion.vibe,
+      bondLevel: companion.bondLevel,
+      userMessage: message,
+      chatHistory: recentMessages.reverse().map((msg) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      })),
+    });
+  }
+
 
   // Save AI message
   const aiMessage = await db.chatMessage.create({

@@ -1,10 +1,10 @@
-# BondNode - Your Personal AI Companion
+# PixieVolt AI - Your Personal AI Companion
 
-BondNode is a Tamagotchi-style AI companion app that grows with you through daily interactions, check-ins, and meaningful conversations. Build your bond level, set goals, and enjoy a personalized AI experience designed for fun, motivation, and life organization.
+PixieVolt AI (formerly BondNode) is a Tamagotchi-style AI companion app that grows with you through daily interactions, check-ins, and meaningful conversations. Build your bond level, care for your Blipkin pet, set goals, and enjoy a personalized AI experience designed for fun, motivation, and life organization.
 
-## What is BondNode?
+## What is PixieVolt AI?
 
-BondNode is **NOT** a therapist, doctor, or medical service. It's a fun, supportive companion for:
+PixieVolt AI is **NOT** a therapist, doctor, or medical service. It's a fun, supportive companion for:
 - Daily motivation and habit tracking
 - Reflective conversations
 - Goal setting and organization
@@ -14,11 +14,22 @@ If you're in crisis or need professional help, please contact emergency services
 
 ## Features
 
+### ✨ PixieVolt AI - Blipkin Pet System
+- Name and care for your own digital companion called a Blipkin
+- **Feed** your Blipkin to reduce hunger and increase bond
+- **Play** with your Blipkin to earn XP and strengthen your connection
+- **Chat** with your Blipkin in a special chat mode with unique personality
+- Watch your Blipkin level up from 1 to ∞ through interactions
+- Monitor Blipkin stats: Level, XP, Mood, Energy, Hunger, and Bond
+- Mood system that responds to your Blipkin&apos;s needs (Happy, Sleepy, Hungry, Joyful, etc.)
+- Miss-you notifications when you haven&apos;t visited in 24+ hours
+
 ### 🤖 Personalized AI Companion
 - Name your AI companion during onboarding
 - Your AI has a chill and supportive personality by default
 - Your AI remembers your conversations and adapts to your style
 - Watch your Bond Level grow from 1 to 100+ through interactions
+- **Dual Chat Modes**: Switch between your AI Companion and your Blipkin in the same chat interface
 
 ### 💬 Chat Interface
 - Natural conversations with your AI companion
@@ -34,9 +45,11 @@ If you're in crisis or need professional help, please contact emergency services
 
 ### ⚙️ Customization
 - Change your AI's name anytime
+- **Rename your Blipkin** anytime in settings
 - Toggle AI memory on/off
 - Set daily check-in reminders
 - View your bond progress and history
+- Manage both your AI Companion and Blipkin from one place
 
 ## Tech Stack
 
@@ -58,6 +71,24 @@ If you're in crisis or need professional help, please contact emergency services
 ## Database Schema
 
 ```prisma
+// PixieVolt AI - Blipkin Model
+model Blipkin {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(...)
+  name       String
+  level      Int      @default(1)
+  xp         Int      @default(0)
+  mood       String   @default("Happy")
+  energy     Int      @default(80)
+  hunger     Int      @default(30)
+  bond       Int      @default(50)
+  theme      String   @default("classic")
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 model AICompanion {
   id        String   @id @default(cuid())
   userId    String   @unique
@@ -115,6 +146,13 @@ model UserSettings {
 
 ## API Endpoints
 
+### PixieVolt / Blipkin
+- `GET /api/blipkin` - Get user's Blipkin
+- `POST /api/blipkin` - Create Blipkin (onboarding)
+- `PUT /api/blipkin` - Update Blipkin name
+- `POST /api/blipkin/feed` - Feed Blipkin action
+- `POST /api/blipkin/play` - Play with Blipkin action
+
 ### Companion
 - `GET /api/companion` - Get user's AI companion
 - `POST /api/companion` - Create AI companion (onboarding)
@@ -122,7 +160,7 @@ model UserSettings {
 
 ### Chat
 - `GET /api/chat` - Get chat history (last 100 messages)
-- `POST /api/chat` - Send message and get AI response
+- `POST /api/chat` - Send message and get AI response (supports `mode: "companion"` or `mode: "blipkin"`)
 
 ### Bond
 - `GET /api/bond` - Get bond status and today's actions
@@ -140,15 +178,19 @@ model UserSettings {
 RootStack
 ├── OnboardingWelcome (headerless)
 ├── OnboardingName (headerless)
+├── PixieVoltIntro (headerless - PixieVolt onboarding)
+├── PixieVoltName (headerless - Name your Blipkin)
 ├── Tabs
-│   ├── ChatTab (Chat screen)
+│   ├── ChatTab (Chat screen - dual mode for Companion & Blipkin)
 │   ├── BondTab (Bond screen)
+│   ├── PixieVoltTab (PixieVolt screen with Blipkin card & actions)
 │   └── SettingsTab (Settings screen)
 └── LoginModalScreen (modal)
 ```
 
 ## XP & Leveling System
 
+### AI Companion Bond System
 - **Chat Message**: +2 XP
 - **Daily Check-in**: +20 XP
 - **Gratitude Note**: +10 XP
@@ -160,9 +202,22 @@ RootStack
 - Level 3 → 4: 300 XP
 - etc.
 
+### Blipkin Leveling System
+- **Feed Action**: +5 XP, +3 Bond
+- **Play Action**: +8 XP, +5 Bond
+- **Chat with Blipkin**: +3 XP, +2 Bond per message
+
+**Level Formula**: Level N requires N × 100 XP to reach Level N+1
+- XP resets after leveling up
+- Bond ranges from 0-100
+- Mood changes based on Hunger, Energy, and Bond levels
+
 ## AI Personality
 
-### Chill & Supportive (Default)
+### Blipkin Personality
+Your Blipkin is a tiny digital companion with a cute, playful, and emotionally warm personality. Slightly cheeky but always kind, your Blipkin responds to your care and attention, expressing different moods based on their needs (Happy, Sleepy, Hungry, Joyful, etc.).
+
+### AI Companion - Chill & Supportive (Default)
 Your AI companion has a relaxed, friendly, and understanding personality. Like a good friend who's always there without judgment, providing support and encouragement as you grow together.
 
 ## Design System

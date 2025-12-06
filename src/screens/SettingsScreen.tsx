@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, Switch, Alert } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Settings as SettingsIcon, User, Bell, Info, LogOut } from "lucide-react-native";
+import { Settings as SettingsIcon, User, Bell, Info, LogOut, Sparkles } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/authClient";
-import type { GetCompanionResponse, GetSettingsResponse, UpdateSettingsResponse } from "@/shared/contracts";
+import type { GetCompanionResponse, GetSettingsResponse, UpdateSettingsResponse, GetBlipkinResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"SettingsTab">;
 
@@ -13,10 +13,18 @@ const SettingsScreen = ({ navigation }: Props) => {
   const queryClient = useQueryClient();
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState("");
+  const [editingBlipkinName, setEditingBlipkinName] = useState(false);
+  const [newBlipkinName, setNewBlipkinName] = useState("");
 
   const { data: companion } = useQuery({
     queryKey: ["companion"],
     queryFn: () => api.get<GetCompanionResponse>("/api/companion"),
+  });
+
+  const { data: blipkin } = useQuery({
+    queryKey: ["blipkin"],
+    queryFn: () => api.get<GetBlipkinResponse>("/api/blipkin"),
+    retry: false,
   });
 
   const { data: settings } = useQuery({
@@ -31,6 +39,16 @@ const SettingsScreen = ({ navigation }: Props) => {
       queryClient.invalidateQueries({ queryKey: ["companion"] });
       setEditingName(false);
       setNewName("");
+    },
+  });
+
+  const updateBlipkinMutation = useMutation({
+    mutationFn: (data: { name: string }) =>
+      api.put<GetBlipkinResponse>("/api/blipkin", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blipkin"] });
+      setEditingBlipkinName(false);
+      setNewBlipkinName("");
     },
   });
 
@@ -69,6 +87,14 @@ const SettingsScreen = ({ navigation }: Props) => {
       updateCompanionMutation.mutate({ name: newName.trim() });
     } else {
       setEditingName(false);
+    }
+  };
+
+  const handleSaveBlipkinName = () => {
+    if (newBlipkinName.trim() && newBlipkinName.trim() !== blipkin?.name) {
+      updateBlipkinMutation.mutate({ name: newBlipkinName.trim() });
+    } else {
+      setEditingBlipkinName(false);
     }
   };
 
@@ -142,6 +168,63 @@ const SettingsScreen = ({ navigation }: Props) => {
             </Text>
           </View>
         </View>
+
+        {/* PixieVolt Blipkin Section */}
+        {blipkin && (
+          <View className="bg-white rounded-2xl p-5 mb-4">
+            <View className="flex-row items-center gap-2 mb-4">
+              <Sparkles size={20} color="#8B5CF6" />
+              <Text className="text-lg font-bold text-gray-900">PixieVolt AI</Text>
+            </View>
+
+            {/* Blipkin Name */}
+            <View>
+              <Text className="text-gray-600 text-sm mb-2">Blipkin Name</Text>
+              {editingBlipkinName ? (
+                <View className="flex-row gap-2">
+                  <TextInput
+                    value={newBlipkinName}
+                    onChangeText={setNewBlipkinName}
+                    placeholder="Enter new name"
+                    className="flex-1 bg-gray-100 rounded-xl px-4 py-3 text-gray-900"
+                    autoFocus
+                    maxLength={20}
+                  />
+                  <Pressable
+                    onPress={() => {
+                      setEditingBlipkinName(false);
+                      setNewBlipkinName("");
+                    }}
+                    className="bg-gray-200 rounded-xl px-4 justify-center"
+                  >
+                    <Text className="text-gray-700 font-semibold">Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={handleSaveBlipkinName}
+                    disabled={!newBlipkinName.trim() || updateBlipkinMutation.isPending}
+                    className="bg-purple-600 rounded-xl px-4 justify-center"
+                  >
+                    <Text className="text-white font-semibold">Save</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    setNewBlipkinName(blipkin.name);
+                    setEditingBlipkinName(true);
+                  }}
+                  className="bg-gray-100 rounded-xl px-4 py-3 flex-row justify-between items-center"
+                >
+                  <Text className="text-gray-900 text-base">{blipkin.name}</Text>
+                  <Text className="text-purple-600 text-sm">Edit</Text>
+                </Pressable>
+              )}
+              <Text className="text-gray-400 text-xs mt-2">
+                Level {blipkin.level} • Bond {blipkin.bond}/100
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Memory & Privacy Section */}
         <View className="bg-white rounded-2xl p-5 mb-4">

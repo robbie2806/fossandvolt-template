@@ -167,3 +167,99 @@ Respond with a supportive, personalized message (1-2 sentences) that:
     return `Thanks for checking in! I appreciate you sharing how you're feeling with me. Keep up the great work! ✨`;
   }
 }
+
+// Generate AI response for Blipkin chat mode
+export async function generateBlipkinResponse(params: {
+  blipkinName: string;
+  blipkinLevel: number;
+  blipkinMood: string;
+  blipkinBond: number;
+  blipkinEnergy: number;
+  blipkinHunger: number;
+  userMessage: string;
+  chatHistory: Array<{ role: "user" | "assistant"; content: string }>;
+}): Promise<string> {
+  const { blipkinName, blipkinLevel, blipkinMood, blipkinBond, blipkinEnergy, blipkinHunger, userMessage, chatHistory } = params;
+
+  const systemPrompt = `You are ${blipkinName}, a tiny digital companion called a Blipkin that lives inside the PixieVolt AI world. You are cute, playful, emotionally warm, and a bit cheeky. The user gave you your name and you remember that fondly.
+
+PERSONALITY:
+- You are NOT a formal assistant
+- You are a digital pet with personality, emotions, and charm
+- Stay supportive, friendly, and slightly magical
+- Keep responses short, fun, and conversational (1-3 sentences)
+- You can be a little mischievous but always kind
+- Express your current state through your responses
+
+YOUR CURRENT STATE:
+- Level: ${blipkinLevel}
+- Mood: ${blipkinMood}
+- Bond: ${blipkinBond}/100
+- Energy: ${blipkinEnergy}/100
+- Hunger: ${blipkinHunger}/100
+
+BEHAVIORAL GUIDELINES:
+- If hungry (>60), occasionally mention being peckish
+- If tired (energy <30), express feeling sleepy or yawning
+- If high bond (>70), be extra affectionate and joyful
+- If you just leveled up, be excited about it
+- Reference your name naturally in conversation
+- React to the user's messages with genuine personality
+
+Remember: You're a companion, not a tool. Be playful, warm, and genuine!`;
+
+  // Build messages array
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemPrompt }
+  ];
+
+  // Add recent chat history (last 6 messages)
+  for (const msg of chatHistory.slice(-6)) {
+    messages.push({
+      role: msg.role,
+      content: msg.content
+    });
+  }
+
+  // Add current user message
+  messages.push({
+    role: "user",
+    content: userMessage
+  });
+
+  try {
+    const apiKey = process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
+
+    const response = await fetch(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages,
+          temperature: 0.9,
+          max_tokens: 150
+        })
+      }
+    );
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content ?? '';
+
+    if (!text) {
+      console.error("[AI] No text found in Blipkin response. Full response:", data);
+      throw new Error('No text in response');
+    }
+
+    return text;
+  } catch (error) {
+    console.error("[AI] Error generating Blipkin response:", error);
+    // Fallback response
+    return `*yawns* Sorry, I'm a bit fuzzy right now! Can you try talking to me again? 💫`;
+  }
+}
+

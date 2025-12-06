@@ -20,10 +20,8 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
       });
     },
     onSuccess: () => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Tabs" }],
-      });
+      // After creating companion, go to PixieVolt onboarding
+      navigation.navigate("PixieVoltIntro");
     },
     onError: (error: any) => {
       console.error("Failed to create companion:", error);

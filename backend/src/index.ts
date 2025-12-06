@@ -10,6 +10,7 @@ import { companionRouter } from "./routes/companion";
 import { chatRouter } from "./routes/chat";
 import { bondRouter } from "./routes/bond";
 import { settingsRouter } from "./routes/settings";
+import { blipkinRouter } from "./routes/blipkin";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -61,6 +62,9 @@ app.route("/api/bond", bondRouter);
 console.log("⚙️  Mounting settings routes at /api/settings");
 app.route("/api/settings", settingsRouter);
 
+console.log("✨ Mounting Blipkin routes at /api/blipkin");
+app.route("/api/blipkin", blipkinRouter);
+
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
 app.get("/health", (c) => {
@@ -82,6 +86,7 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  💬 Chat:       GET/POST /api/chat");
   console.log("  🎯 Bond:       GET /api/bond, POST /api/bond/check-in, /api/bond/gratitude, /api/bond/goal");
   console.log("  ⚙️  Settings:   GET/PUT /api/settings");
+  console.log("  ✨ Blipkin:    GET/POST/PUT /api/blipkin, POST /api/blipkin/feed, /api/blipkin/play");
   console.log("  💚 Health:     GET /health");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 });

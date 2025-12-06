@@ -11,10 +11,10 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Send, Sparkles } from "lucide-react-native";
+import { Send, Sparkles, ArrowLeft } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
-import type { GetChatHistoryResponse, GetCompanionResponse, SendChatMessageResponse } from "@/shared/contracts";
+import type { GetChatHistoryResponse, GetCompanionResponse, GetBlipkinResponse, SendChatMessageResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"ChatTab">;
 
@@ -25,16 +25,34 @@ type Message = {
   createdAt: string;
 };
 
-const ChatScreen = ({ navigation }: Props) => {
+const ChatScreen = ({ navigation, route }: Props) => {
   const [inputText, setInputText] = useState("");
+  const [chatMode, setChatMode] = useState<"companion" | "blipkin">("companion");
   const flatListRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
+
+  // Check if coming from PixieVolt screen (to chat with Blipkin)
+  useEffect(() => {
+    // If navigated from PixieVolt tab, default to Blipkin mode
+    const state = navigation.getState();
+    const previousRoute = state.routes[state.index - 1];
+    if (previousRoute?.name === "PixieVoltTab") {
+      setChatMode("blipkin");
+    }
+  }, [navigation]);
 
   // Fetch companion info
   const { data: companion } = useQuery({
     queryKey: ["companion"],
     queryFn: () => api.get<GetCompanionResponse>("/api/companion"),
+  });
+
+  // Fetch Blipkin info
+  const { data: blipkin } = useQuery({
+    queryKey: ["blipkin"],
+    queryFn: () => api.get<GetBlipkinResponse>("/api/blipkin"),
+    retry: false,
   });
 
   // Fetch chat history
@@ -46,11 +64,12 @@ const ChatScreen = ({ navigation }: Props) => {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: (message: string) =>
-      api.post<SendChatMessageResponse>("/api/chat", { message }),
+      api.post<SendChatMessageResponse>("/api/chat", { message, mode: chatMode }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chat"] });
       queryClient.invalidateQueries({ queryKey: ["companion"] });
       queryClient.invalidateQueries({ queryKey: ["bond"] });
+      queryClient.invalidateQueries({ queryKey: ["blipkin"] });
       setInputText("");
     },
   });
@@ -71,23 +90,65 @@ const ChatScreen = ({ navigation }: Props) => {
 
   const messages: Message[] = chatData?.messages || [];
 
+  const currentEntity = chatMode === "blipkin" ? blipkin : companion;
+  const currentName = chatMode === "blipkin" ? blipkin?.name : companion?.name;
+  const currentLevel = chatMode === "blipkin" ? blipkin?.level : companion?.bondLevel;
+
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: "#FFFFFF" }}>
         {/* Header */}
-        <View className="bg-white border-b border-gray-200 px-4 py-4 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-3">
-            <View className="bg-purple-100 rounded-full p-2">
-              <Sparkles size={24} color="#8B5CF6" />
-            </View>
-            <View>
-              <Text className="text-lg font-bold text-gray-900">{companion?.name || "..."}</Text>
-              <View className="flex-row items-center gap-1.5">
-                <View className="w-2 h-2 bg-green-500 rounded-full" />
-                <Text className="text-sm text-gray-500">Bond Level {companion?.bondLevel || 1}</Text>
+        <View className="bg-white border-b border-gray-200 px-4 py-4">
+          <View className="flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center gap-3">
+              <View className="bg-purple-100 rounded-full p-2">
+                <Sparkles size={24} color="#8B5CF6" />
+              </View>
+              <View>
+                <Text className="text-lg font-bold text-gray-900">{currentName || "..."}</Text>
+                <View className="flex-row items-center gap-1.5">
+                  <View className="w-2 h-2 bg-green-500 rounded-full" />
+                  <Text className="text-sm text-gray-500">
+                    {chatMode === "blipkin" ? `Level ${currentLevel}` : `Bond Level ${currentLevel}`}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
+
+          {/* Mode Toggle */}
+          {blipkin && companion && (
+            <View className="flex-row gap-2">
+              <Pressable
+                onPress={() => setChatMode("companion")}
+                className={`flex-1 rounded-xl py-2 ${
+                  chatMode === "companion" ? "bg-purple-600" : "bg-gray-100"
+                }`}
+              >
+                <Text
+                  className={`text-center font-semibold ${
+                    chatMode === "companion" ? "text-white" : "text-gray-600"
+                  }`}
+                >
+                  {companion.name}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setChatMode("blipkin")}
+                className={`flex-1 rounded-xl py-2 ${
+                  chatMode === "blipkin" ? "bg-purple-600" : "bg-gray-100"
+                }`}
+              >
+                <Text
+                  className={`text-center font-semibold ${
+                    chatMode === "blipkin" ? "text-white" : "text-gray-600"
+                  }`}
+                >
+                  {blipkin.name}
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </SafeAreaView>
 
@@ -105,10 +166,12 @@ const ChatScreen = ({ navigation }: Props) => {
           <View style={{ flex: 1 }} className="justify-center items-center px-8">
             <Sparkles size={48} color="#D1D5DB" />
             <Text className="text-gray-400 text-center mt-4 text-lg">
-              Start chatting with {companion?.name || "your AI companion"}!
+              Start chatting with {currentName || "your companion"}!
             </Text>
             <Text className="text-gray-400 text-center mt-2 text-sm">
-              Every message helps grow your bond
+              {chatMode === "blipkin"
+                ? "Chat to build your bond and help your Blipkin grow"
+                : "Every message helps grow your bond"}
             </Text>
           </View>
         ) : (

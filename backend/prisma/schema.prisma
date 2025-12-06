@@ -27,6 +27,7 @@ model User {
   dailyCheckIns DailyCheckIn[]
   bondActions   BondAction[]
   settings      UserSettings?
+  blipkin       Blipkin?
 
   @@map("user")
 }
@@ -140,3 +141,24 @@ model UserSettings {
 
   @@map("user_settings")
 }
+
+// PixieVolt AI - Blipkin Pet Model
+model Blipkin {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  level      Int      @default(1)
+  xp         Int      @default(0)
+  mood       String   @default("Happy") // "Happy", "Sleepy", "Lonely", "Excited", "Hungry", "Content", "Joyful"
+  energy     Int      @default(80)
+  hunger     Int      @default(30)
+  bond       Int      @default(50)
+  theme      String   @default("classic")
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("blipkin")
+}
+

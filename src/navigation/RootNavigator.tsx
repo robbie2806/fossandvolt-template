@@ -1,13 +1,16 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Haptics from "expo-haptics";
-import { MessageCircle, Target, Settings } from "lucide-react-native";
+import { MessageCircle, Target, Sparkles, Settings } from "lucide-react-native";
 
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
 import OnboardingWelcomeScreen from "@/screens/OnboardingWelcomeScreen";
 import OnboardingNameScreen from "@/screens/OnboardingNameScreen";
+import PixieVoltIntroScreen from "@/screens/PixieVoltIntroScreen";
+import PixieVoltNameScreen from "@/screens/PixieVoltNameScreen";
 import ChatScreen from "@/screens/ChatScreen";
 import BondScreen from "@/screens/BondScreen";
+import PixieVoltScreen from "@/screens/PixieVoltScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 
@@ -29,6 +32,16 @@ const RootNavigator = () => {
       <RootStack.Screen
         name="OnboardingName"
         component={OnboardingNameScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="PixieVoltIntro"
+        component={PixieVoltIntroScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="PixieVoltName"
+        component={PixieVoltNameScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen
@@ -84,6 +97,15 @@ const BottomTabNavigator = () => {
         options={{
           title: "Bond",
           tabBarIcon: ({ color, size }) => <Target size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="PixieVoltTab"
+        component={PixieVoltScreen}
+        options={{
+          title: "PixieVolt",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => <Sparkles size={size} color={color} />,
         }}
       />
       <BottomTab.Screen

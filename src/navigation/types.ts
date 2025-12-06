@@ -14,6 +14,10 @@ export type RootStackParamList = {
   OnboardingWelcome: undefined;
   OnboardingName: undefined;
 
+  // PixieVolt onboarding flow
+  PixieVoltIntro: undefined;
+  PixieVoltName: undefined;
+
   // Main app tabs
   Tabs: NavigatorScreenParams<BottomTabParamList> | undefined;
 
@@ -24,6 +28,7 @@ export type RootStackParamList = {
 export type BottomTabParamList = {
   ChatTab: undefined;
   BondTab: undefined;
+  PixieVoltTab: undefined;
   SettingsTab: undefined;
 };
 

@@ -27,17 +27,39 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
           if (!isActive) return;
 
           if (session?.data?.user) {
-            // User is logged in, check if they have a companion
+            // User is logged in, check if they have a companion AND Blipkin
+            let hasCompanion = false;
+            let hasBlipkin = false;
+
             try {
               await api.get("/api/companion");
-              // Has companion, navigate to tabs
-              if (isActive) {
-                navigation.replace("Tabs");
-              }
-              return;
+              hasCompanion = true;
             } catch (error) {
-              // No companion, stay on welcome screen
+              // No companion
             }
+
+            try {
+              await api.get("/api/blipkin");
+              hasBlipkin = true;
+            } catch (error) {
+              // No Blipkin
+            }
+
+            if (!isActive) return;
+
+            // If they have both, go to tabs
+            if (hasCompanion && hasBlipkin) {
+              navigation.replace("Tabs");
+              return;
+            }
+
+            // If they have companion but no Blipkin, show PixieVolt onboarding
+            if (hasCompanion && !hasBlipkin) {
+              navigation.replace("PixieVoltIntro");
+              return;
+            }
+
+            // If they have neither, stay on welcome screen
           }
         } catch (error) {
           console.error("Auth check error:", error);

@@ -58,6 +58,7 @@ export type GetChatHistoryResponse = z.infer<typeof getChatHistoryResponseSchema
 // POST /api/chat - Send message and get AI response
 export const sendChatMessageRequestSchema = z.object({
   message: z.string().min(1, "Message cannot be empty"),
+  mode: z.enum(["companion", "blipkin"]).optional().default("companion"),
 });
 export type SendChatMessageRequest = z.infer<typeof sendChatMessageRequestSchema>;
 export const sendChatMessageResponseSchema = z.object({
@@ -163,3 +164,64 @@ export const updateSettingsRequestSchema = z.object({
 export type UpdateSettingsRequest = z.infer<typeof updateSettingsRequestSchema>;
 export const updateSettingsResponseSchema = getSettingsResponseSchema;
 export type UpdateSettingsResponse = z.infer<typeof updateSettingsResponseSchema>;
+
+// ============================================
+// PixieVolt AI - Blipkin Endpoints
+// ============================================
+
+// GET /api/blipkin - Get user's Blipkin
+export const getBlipkinResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  level: z.number(),
+  xp: z.number(),
+  mood: z.string(),
+  energy: z.number(),
+  hunger: z.number(),
+  bond: z.number(),
+  theme: z.string(),
+  lastSeenAt: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  missedYou: z.boolean().optional(),
+});
+export type GetBlipkinResponse = z.infer<typeof getBlipkinResponseSchema>;
+
+// POST /api/blipkin - Create Blipkin (during PixieVolt onboarding)
+export const createBlipkinRequestSchema = z.object({
+  name: z.string().min(1, "Blipkin name is required").max(20, "Name too long"),
+});
+export type CreateBlipkinRequest = z.infer<typeof createBlipkinRequestSchema>;
+export const createBlipkinResponseSchema = getBlipkinResponseSchema;
+export type CreateBlipkinResponse = z.infer<typeof createBlipkinResponseSchema>;
+
+// PUT /api/blipkin - Update Blipkin (rename)
+export const updateBlipkinRequestSchema = z.object({
+  name: z.string().min(1, "Blipkin name is required").max(20, "Name too long").optional(),
+});
+export type UpdateBlipkinRequest = z.infer<typeof updateBlipkinRequestSchema>;
+export const updateBlipkinResponseSchema = getBlipkinResponseSchema;
+export type UpdateBlipkinResponse = z.infer<typeof updateBlipkinResponseSchema>;
+
+// POST /api/blipkin/feed - Feed Blipkin
+export const feedBlipkinResponseSchema = z.object({
+  success: z.boolean(),
+  blipkin: getBlipkinResponseSchema,
+  xpGained: z.number(),
+  bondGained: z.number(),
+  leveledUp: z.boolean(),
+  message: z.string(),
+});
+export type FeedBlipkinResponse = z.infer<typeof feedBlipkinResponseSchema>;
+
+// POST /api/blipkin/play - Play with Blipkin
+export const playBlipkinResponseSchema = z.object({
+  success: z.boolean(),
+  blipkin: getBlipkinResponseSchema,
+  xpGained: z.number(),
+  bondGained: z.number(),
+  leveledUp: z.boolean(),
+  message: z.string(),
+});
+export type PlayBlipkinResponse = z.infer<typeof playBlipkinResponseSchema>;
+
