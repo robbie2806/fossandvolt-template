@@ -233,6 +233,10 @@ Remember: You're a companion, not a tool. Be playful, warm, and genuine!`;
     const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
     const apiKey = process.env.CODEX_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY || '';
 
+    console.log('[AI] Blipkin - Using base URL:', baseUrl);
+    console.log('[AI] Blipkin - API key from CODEX_API_KEY:', !!process.env.CODEX_API_KEY);
+    console.log('[AI] Blipkin - Final API key present:', !!apiKey, 'Length:', apiKey?.length || 0);
+
     const response = await fetch(
       `${baseUrl}/chat/completions`,
       {
