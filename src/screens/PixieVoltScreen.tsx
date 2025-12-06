@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Image } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Image, Animated, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
@@ -40,12 +40,109 @@ const getBlipkinImage = (evolutionStage: string, megaForm?: string | null) => {
 
 const PixieVoltScreen = ({ navigation }: Props) => {
   const queryClient = useQueryClient();
+  const [showEvolution, setShowEvolution] = React.useState(false);
+  const [evolutionData, setEvolutionData] = React.useState<{
+    oldStage: string;
+    newStage: string;
+    newLevel: number;
+  } | null>(null);
+
+  // Animation values
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   // Fetch Blipkin data
   const { data: blipkin, isLoading } = useQuery({
     queryKey: ["blipkin"],
     queryFn: () => api.get<GetBlipkinResponse>("/api/blipkin"),
   });
+
+  // Track previous evolution stage to detect changes
+  const previousStageRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (blipkin && previousStageRef.current && previousStageRef.current !== blipkin.evolutionStage) {
+      // Evolution detected!
+      setEvolutionData({
+        oldStage: previousStageRef.current,
+        newStage: blipkin.evolutionStage,
+        newLevel: blipkin.level,
+      });
+      setShowEvolution(true);
+      playEvolutionAnimation();
+    }
+    if (blipkin) {
+      previousStageRef.current = blipkin.evolutionStage;
+    }
+  }, [blipkin?.evolutionStage]);
+
+  const playEvolutionAnimation = () => {
+    // Reset animations
+    scaleAnim.setValue(1);
+    opacityAnim.setValue(1);
+    glowAnim.setValue(0);
+
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    // Sequence of animations
+    Animated.sequence([
+      // Shrink and fade
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 0.5,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Pause
+      Animated.delay(300),
+      // Grow and glow
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 1.2,
+          friction: 3,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(glowAnim, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(glowAnim, {
+              toValue: 0,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+          ]),
+          { iterations: 3 }
+        ),
+      ]),
+      // Return to normal
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 5,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Animation complete
+      setTimeout(() => setShowEvolution(false), 1000);
+    });
+  };
 
   // Feed mutation
   const feedMutation = useMutation({
@@ -309,6 +406,71 @@ const PixieVoltScreen = ({ navigation }: Props) => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Evolution Animation Modal */}
+      <Modal
+        visible={showEvolution}
+        transparent={true}
+        animationType="none"
+        statusBarTranslucent
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.95)', justifyContent: 'center', alignItems: 'center' }}>
+          {/* Animated Blipkin */}
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleAnim }],
+              opacity: opacityAnim,
+            }}
+          >
+            <View style={{ alignItems: 'center' }}>
+              {/* Glow effect */}
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  width: 200,
+                  height: 200,
+                  borderRadius: 100,
+                  backgroundColor: '#8B5CF6',
+                  opacity: glowAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 0.5],
+                  }),
+                  transform: [
+                    {
+                      scale: glowAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.5],
+                      }),
+                    },
+                  ],
+                }}
+              />
+
+              {/* Blipkin Image */}
+              <Image
+                source={blipkin ? getBlipkinImage(blipkin.evolutionStage, blipkin.megaForm) : require("../../assets/blipkin-baby.png")}
+                style={{ width: 160, height: 160 }}
+                resizeMode="contain"
+              />
+            </View>
+          </Animated.View>
+
+          {/* Evolution Text */}
+          {evolutionData && (
+            <View style={{ marginTop: 40, alignItems: 'center', paddingHorizontal: 32 }}>
+              <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#FFFFFF', textAlign: 'center', marginBottom: 12 }}>
+                Evolution! ✨
+              </Text>
+              <Text style={{ fontSize: 20, color: '#A78BFA', textAlign: 'center', marginBottom: 8 }}>
+                {blipkin?.name} reached Level {evolutionData.newLevel}!
+              </Text>
+              <Text style={{ fontSize: 18, color: '#C4B5FD', textAlign: 'center' }}>
+                {evolutionData.oldStage.charAt(0).toUpperCase() + evolutionData.oldStage.slice(1)} → {evolutionData.newStage.charAt(0).toUpperCase() + evolutionData.newStage.slice(1)}
+              </Text>
+            </View>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 };

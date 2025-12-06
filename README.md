@@ -17,6 +17,13 @@ If you're in crisis or need professional help, please contact emergency services
 
 ### ✨ PixieVolt AI - Blipkin Evolution System
 - **6 Evolution Stages**: Baby → Child → Teen → Adult → Mega → Elder
+  - **Baby**: Level 1-5 (starting stage)
+  - **Child**: Level 6-15 (evolves at Level 6)
+  - **Teen**: Level 16-30 (evolves at Level 16)
+  - **Adult**: Level 31-50 (evolves at Level 31)
+  - **Mega**: Level 51-99 (evolves at Level 51, mega form depends on care style)
+  - **Elder**: Level 100+ (legendary status!)
+- **Evolution Animation**: Beautiful shrink-and-grow animation with glowing effects when evolving!
 - **4 Mega Forms**: Your care style determines your Mega form (Nurturer, Explorer, Chaos, Calm)
 - **Care Actions**: Feed, Play, Clean, and Rest your Blipkin
 - **Stat System**: Monitor Hunger, Energy, Cleanliness, and Bond
@@ -369,6 +376,23 @@ Before distributing to testers, verify:
 ---
 
 ## Recent Changes
+
+### Evolution Animation & Level Information (Dec 6, 2025)
+- **NEW**: Beautiful evolution animation when your Blipkin evolves!
+  - Shrink and fade effect
+  - Glowing purple aura
+  - Spring animation with haptic feedback
+  - Full-screen modal with evolution announcement
+  - Shows old stage → new stage transition
+- **CLARITY**: Added clear evolution level information to README
+  - Baby: Level 1-5
+  - Child: Level 6-15 (evolves **AT** Level 6, not after)
+  - Teen: Level 16-30 (evolves **AT** Level 16)
+  - Adult: Level 31-50 (evolves **AT** Level 31)
+  - Mega: Level 51-99 (evolves **AT** Level 51)
+  - Elder: Level 100+
+- **IMPROVED**: Evolution detection now automatically shows animation
+- **BETTER UX**: Users now see exactly when evolution happens
 
 ### Chat XP Boost - Best Rewards! (Dec 6, 2025)
 - **BOOSTED**: Chat now gives the HIGHEST XP rewards!
