@@ -31,9 +31,7 @@
       },
       "package": "com.vibecode.pixievolt"
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": [],
     "extra": {
       "eas": {
         "projectId": "019ac803-4cd2-71dc-9e67-88b2838ceaf1"
