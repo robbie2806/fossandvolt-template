@@ -141,12 +141,12 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
 
           {/* Title */}
           <Text className="text-4xl font-bold text-white text-center mb-4">
-            Welcome to BondNode
+            Welcome to PixieVolt AI
           </Text>
 
           {/* Subtitle */}
           <Text className="text-lg text-white/90 text-center mb-12 leading-relaxed">
-            Create your own personal AI companion and watch your bond grow stronger every day
+            Create your own personal AI companion and digital pet. Watch them grow stronger every day
           </Text>
 
           {/* Start Button */}
