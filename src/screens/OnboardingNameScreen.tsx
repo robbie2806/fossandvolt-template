@@ -55,7 +55,7 @@ const OnboardingNameScreen = ({ navigation }: Props) => {
 
           {/* Title */}
           <Text className="text-3xl font-bold text-white text-center mb-4">
-            Name your AI companion
+            Name your Blipkin
           </Text>
 
           {/* Subtitle */}
