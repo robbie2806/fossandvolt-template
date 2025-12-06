@@ -79,17 +79,35 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
 
     // Step 3: Error handling - Check if the response was successful
     if (!response.ok) {
-      // Parse the error details from the response body
-      const errorData = await response.json();
-      // Throw a descriptive error with status code, status text, and server error data
-      throw new Error(
-        `[api.ts]: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`,
-      );
+      // Try to parse error details, but handle cases where response isn't JSON
+      let errorMessage = `${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = `${errorMessage} ${JSON.stringify(errorData)}`;
+      } catch {
+        // If response isn't JSON, try to get text
+        try {
+          const errorText = await response.text();
+          errorMessage = `${errorMessage} ${errorText.substring(0, 200)}`;
+        } catch {
+          // If we can't parse at all, just use the status
+        }
+      }
+      throw new Error(`[api.ts]: ${errorMessage}`);
     }
 
     // Step 4: Parse and return the successful response as JSON
     // The response is cast to the expected type T for type safety
-    return response.json() as Promise<T>;
+    const responseText = await response.text();
+    if (!responseText) {
+      return {} as T; // Return empty object for empty responses
+    }
+    try {
+      return JSON.parse(responseText) as T;
+    } catch (parseError) {
+      console.log(`[api.ts] JSON parse error. Response: ${responseText.substring(0, 200)}`);
+      throw new Error(`Invalid JSON response from server`);
+    }
   } catch (error: any) {
     // Log the error for debugging purposes
     console.log(`[api.ts]: ${error}`);
