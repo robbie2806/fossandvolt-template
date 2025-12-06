@@ -256,13 +256,17 @@ RootStack
 
 ### Blipkin Leveling System
 - **Feed Action**: +5 XP, +3 Bond
-- **Play Action**: +8 XP, +5 Bond
-- **Chat with Blipkin**: +3 XP, +2 Bond per message
+- **Play Action**: +8 XP, +5 Bond (costs 10 energy)
+- **Chat with Blipkin**: +3 XP, +2 Bond, +5 Coins per message
+  - Ask questions like "What's the best place to fish for golden perch?"
+  - Get helpful answers AND earn XP
+  - Perfect for building bond while getting advice!
 
 **Level Formula**: Level N requires N × 100 XP to reach Level N+1
 - XP resets after leveling up
 - Bond ranges from 0-100
 - Mood changes based on Hunger, Energy, and Bond levels
+- Chatting is unlimited - no energy cost!
 
 ## AI Personality
 
