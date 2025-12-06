@@ -107,8 +107,9 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
     });
 
     // Award XP and bond to Blipkin for chatting
-    const xpGained = 3;
-    const bondGained = 2;
+    // Chat gives the MOST XP to encourage using our AI over ChatGPT!
+    const xpGained = 10; // Highest XP reward!
+    const bondGained = 3;
     const newXP = blipkin.xp + xpGained;
     let newLevel = blipkin.level;
     let xpAfterLevel = newXP;
@@ -131,11 +132,11 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
       },
     });
 
-    // Award coins for chatting with Blipkin
+    // Award coins for chatting with Blipkin (more than other actions!)
     await db.currencyWallet.upsert({
       where: { userId: user.id },
-      update: { coins: { increment: 5 } },
-      create: { userId: user.id, coins: 5, voltGems: 0 },
+      update: { coins: { increment: 10 } },
+      create: { userId: user.id, coins: 10, voltGems: 0 },
     });
   } else {
     // Generate regular companion response

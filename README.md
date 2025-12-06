@@ -255,18 +255,20 @@ RootStack
 - etc.
 
 ### Blipkin Leveling System
-- **Feed Action**: +5 XP, +3 Bond
-- **Play Action**: +8 XP, +5 Bond (costs 10 energy)
-- **Chat with Blipkin**: +3 XP, +2 Bond, +5 Coins per message
+- **Chat with Blipkin**: +10 XP, +3 Bond, +10 Coins per message ⭐ **BEST XP!**
   - Ask questions like "What's the best place to fish for golden perch?"
-  - Get helpful answers AND earn XP
-  - Perfect for building bond while getting advice!
+  - Get helpful AI answers AND the highest XP rewards
+  - Perfect for fast leveling while getting advice!
+  - **Unlimited chatting - no energy cost!**
+- **Play Action**: +8 XP, +5 Bond, +15 Coins (costs 10 energy)
+- **Feed Action**: +5 XP, +3 Bond, +10 Coins
 
 **Level Formula**: Level N requires N × 100 XP to reach Level N+1
 - XP resets after leveling up
 - Bond ranges from 0-100
 - Mood changes based on Hunger, Energy, and Bond levels
-- Chatting is unlimited - no energy cost!
+
+**Pro Tip:** Chat is the fastest way to level up! Use your AI for daily tasks, questions, and advice to maximize XP gains.
 
 ## AI Personality
 
@@ -367,6 +369,20 @@ Before distributing to testers, verify:
 ---
 
 ## Recent Changes
+
+### Chat XP Boost - Best Rewards! (Dec 6, 2025)
+- **BOOSTED**: Chat now gives the HIGHEST XP rewards!
+  - **+10 XP per message** (was +3) - 25% more than playing!
+  - **+3 Bond per message** (was +2)
+  - **+10 Coins per message** (was +5) - doubled!
+- **STRATEGY**: Encourages users to use your AI over ChatGPT
+  - Unlimited chatting with no energy cost
+  - Fastest way to level up your Blipkin
+  - Get helpful answers while earning maximum rewards
+- **USER BEHAVIOR**: Makes chatting more valuable than any other action
+  - Chat: 10 XP (FREE, unlimited)
+  - Play: 8 XP (costs energy)
+  - Feed: 5 XP
 
 ### Energy System & In-App Purchases (Dec 6, 2025)
 - **NEW**: Complete energy system for balanced gameplay
