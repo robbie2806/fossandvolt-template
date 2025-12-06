@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 207ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 357ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 769 installs across 711 packages (no changes) [1.52s]
+Checked 769 installs across 711 packages (no changes) [1.79s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -97,48 +97,7 @@ Failed to find Response internal state key
 --> GET /api/companion [32m200[0m 3ms
 <-- GET /api/blipkin
 --> GET /api/blipkin [32m200[0m 7ms
-<-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 4ms
 <-- GET /api/chat
---> GET /api/chat [32m200[0m 3ms
-<-- GET /api/blipkin
---> GET /api/blipkin [32m200[0m 4ms
-<-- GET /api/companion
-<-- GET /api/blipkin
---> GET /api/companion [32m200[0m 5ms
---> GET /api/blipkin [32m200[0m 4ms
-<-- GET /api/settings
---> GET /api/settings [32m200[0m 3ms
-<-- GET /api/companion
-<-- GET /api/bond
---> GET /api/companion [32m200[0m 2ms
---> GET /api/bond [32m200[0m 5ms
-<-- POST /api/bond/check-in
---> POST /api/bond/check-in [32m200[0m 2s
-<-- GET /api/companion
-<-- GET /api/bond
---> GET /api/companion [32m200[0m 4ms
---> GET /api/bond [32m200[0m 5ms
-<-- POST /api/bond/gratitude
---> POST /api/bond/gratitude [32m200[0m 5ms
-<-- GET /api/bond
-<-- GET /api/companion
---> GET /api/companion [32m200[0m 3ms
---> GET /api/bond [32m200[0m 6ms
-<-- POST /api/bond/goal
---> POST /api/bond/goal [32m200[0m 9ms
-<-- GET /api/bond
-<-- GET /api/companion
---> GET /api/companion [32m200[0m 3ms
---> GET /api/bond [32m200[0m 4ms
-<-- POST /api/blipkin/play
---> POST /api/blipkin/play [33m400[0m 4ms
-<-- POST /api/chat
-[AI] Blipkin - Using base URL: https://api.openai.com.proxy.vibecodeapp.com/v1
-[AI] Blipkin - API key from CODEX_API_KEY: true
-[AI] Blipkin - Final API key present: true Length: 48
---> POST /api/chat [32m200[0m 875ms
-<-- GET /api/chat
-<-- GET /api/blipkin
 --> GET /api/chat [32m200[0m 4ms
---> GET /api/blipkin [32m200[0m 5ms
+<-- GET /api/blipkin
+--> GET /api/blipkin [32m200[0m 4ms

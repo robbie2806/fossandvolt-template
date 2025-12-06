@@ -106,7 +106,7 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
 
       // Create anonymous account
       const uniqueId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      const email = `${uniqueId}@bondnode.app`;
+      const email = `${uniqueId}@pixievolt.app`;
       const password = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 
       await authClient.signUp.email({
