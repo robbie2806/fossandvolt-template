@@ -126,6 +126,7 @@ chatRouter.post("/", zValidator("json", sendChatMessageRequestSchema), async (c)
         xp: xpAfterLevel,
         level: newLevel,
         bond: Math.min(100, blipkin.bond + bondGained),
+        totalChats: blipkin.totalChats + 1,
         lastSeenAt: new Date(),
       },
     });

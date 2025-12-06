@@ -175,15 +175,20 @@ export const getBlipkinResponseSchema = z.object({
   name: z.string(),
   level: z.number(),
   xp: z.number(),
+  evolutionStage: z.string(),
+  megaForm: z.string().nullable(),
   mood: z.string(),
   energy: z.number(),
   hunger: z.number(),
+  cleanliness: z.number(),
   bond: z.number(),
+  currentAnimation: z.string(),
   theme: z.string(),
   lastSeenAt: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
   missedYou: z.boolean().optional(),
+  canEvolve: z.boolean().optional(),
 });
 export type GetBlipkinResponse = z.infer<typeof getBlipkinResponseSchema>;
 
@@ -210,6 +215,7 @@ export const feedBlipkinResponseSchema = z.object({
   xpGained: z.number(),
   bondGained: z.number(),
   leveledUp: z.boolean(),
+  evolved: z.boolean(),
   message: z.string(),
 });
 export type FeedBlipkinResponse = z.infer<typeof feedBlipkinResponseSchema>;
@@ -221,7 +227,33 @@ export const playBlipkinResponseSchema = z.object({
   xpGained: z.number(),
   bondGained: z.number(),
   leveledUp: z.boolean(),
+  evolved: z.boolean(),
   message: z.string(),
 });
 export type PlayBlipkinResponse = z.infer<typeof playBlipkinResponseSchema>;
+
+// POST /api/blipkin/clean - Clean Blipkin
+export const cleanBlipkinResponseSchema = z.object({
+  success: z.boolean(),
+  blipkin: getBlipkinResponseSchema,
+  xpGained: z.number(),
+  bondGained: z.number(),
+  leveledUp: z.boolean(),
+  evolved: z.boolean(),
+  message: z.string(),
+});
+export type CleanBlipkinResponse = z.infer<typeof cleanBlipkinResponseSchema>;
+
+// POST /api/blipkin/rest - Rest Blipkin
+export const restBlipkinResponseSchema = z.object({
+  success: z.boolean(),
+  blipkin: getBlipkinResponseSchema,
+  xpGained: z.number(),
+  bondGained: z.number(),
+  leveledUp: z.boolean(),
+  evolved: z.boolean(),
+  message: z.string(),
+});
+export type RestBlipkinResponse = z.infer<typeof restBlipkinResponseSchema>;
+
 

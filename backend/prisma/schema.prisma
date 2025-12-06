@@ -150,12 +150,32 @@ model Blipkin {
   name       String
   level      Int      @default(1)
   xp         Int      @default(0)
-  mood       String   @default("Happy") // "Happy", "Sleepy", "Lonely", "Excited", "Hungry", "Content", "Joyful"
-  energy     Int      @default(80)
-  hunger     Int      @default(30)
-  bond       Int      @default(50)
+
+  // Evolution System
+  evolutionStage String @default("baby") // "baby", "child", "teen", "adult", "mega", "elder"
+  megaForm       String? // "nurturer", "explorer", "chaos", "calm" (only for mega stage)
+
+  // Stats
+  mood          String @default("Happy") // "Happy", "Sleepy", "Lonely", "Excited", "Hungry", "Content", "Joyful", "Sick", "Frustrated", "Playful"
+  energy        Int    @default(80)
+  hunger        Int    @default(30)
+  cleanliness   Int    @default(100) // New stat for evolution
+  bond          Int    @default(50)
+
+  // Care History (for mega form evolution)
+  totalFeeds    Int @default(0)
+  totalPlays    Int @default(0)
+  totalCleans   Int @default(0)
+  totalRests    Int @default(0)
+  totalChats    Int @default(0)
+  daysAlive     Int @default(0)
+
+  // Animation State
+  currentAnimation String @default("idle") // "idle", "happy", "hungry", "sleep", "sick", "excited", "evolving"
+
   theme      String   @default("classic")
   lastSeenAt DateTime @default(now())
+  lastStatUpdate DateTime @default(now()) // For stat degradation
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

@@ -8,25 +8,51 @@ import {
   type UpdateBlipkinResponse,
   type FeedBlipkinResponse,
   type PlayBlipkinResponse,
+  type CleanBlipkinResponse,
+  type RestBlipkinResponse,
 } from "@/shared/contracts";
 import { db } from "../db";
 import { type AppType } from "../types";
+import {
+  calculateMood,
+  calculateAnimation,
+  degradeStats,
+  calculateLevelUp,
+  checkForEvolution,
+} from "../utils/evolution";
 
 const blipkinRouter = new Hono<AppType>();
 
-// Helper function to calculate mood based on stats
-function calculateMood(hunger: number, energy: number, bond: number): string {
-  if (hunger > 70) return "Hungry";
-  if (energy < 30) return "Sleepy";
-  if (bond < 30) return "Lonely";
-  if (bond > 80) return "Joyful";
-  if (energy > 80 && bond > 60) return "Excited";
-  return "Content";
-}
+// Helper to update stat degradation based on time passed
+async function applyStatDegradation(blipkinId: string, userId: string) {
+  const blipkin = await db.blipkin.findUnique({ where: { userId } });
+  if (!blipkin) return null;
 
-// Helper function to calculate XP needed for level
-function xpForLevel(level: number): number {
-  return level * 100;
+  const now = new Date();
+  const lastUpdate = new Date(blipkin.lastStatUpdate);
+  const hoursElapsed = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+
+  // Only degrade if more than 1 hour passed
+  if (hoursElapsed < 1) return blipkin;
+
+  const degradedStats = degradeStats(blipkin, hoursElapsed);
+  const newMood = calculateMood({
+    ...blipkin,
+    ...degradedStats,
+  });
+  const newAnimation = calculateAnimation(newMood);
+
+  return await db.blipkin.update({
+    where: { userId },
+    data: {
+      hunger: degradedStats.hunger,
+      energy: degradedStats.energy,
+      cleanliness: degradedStats.cleanliness,
+      mood: newMood,
+      currentAnimation: newAnimation,
+      lastStatUpdate: now,
+    },
+  });
 }
 
 // ============================================
@@ -38,13 +64,16 @@ blipkinRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const blipkin = await db.blipkin.findUnique({
+  let blipkin = await db.blipkin.findUnique({
     where: { userId: user.id },
   });
 
   if (!blipkin) {
     return c.json({ message: "Blipkin not found" }, 404);
   }
+
+  // Apply stat degradation
+  blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
 
   // Update lastSeenAt
   const updatedBlipkin = await db.blipkin.update({
@@ -56,20 +85,28 @@ blipkinRouter.get("/", async (c) => {
   const hoursSinceLastSeen = (new Date().getTime() - blipkin.lastSeenAt.getTime()) / (1000 * 60 * 60);
   const missedYou = hoursSinceLastSeen >= 24;
 
+  // Check for evolution
+  const evolutionCheck = checkForEvolution(updatedBlipkin);
+
   return c.json({
     id: updatedBlipkin.id,
     name: updatedBlipkin.name,
     level: updatedBlipkin.level,
     xp: updatedBlipkin.xp,
+    evolutionStage: updatedBlipkin.evolutionStage,
+    megaForm: updatedBlipkin.megaForm,
     mood: updatedBlipkin.mood,
     energy: updatedBlipkin.energy,
     hunger: updatedBlipkin.hunger,
+    cleanliness: updatedBlipkin.cleanliness,
     bond: updatedBlipkin.bond,
+    currentAnimation: updatedBlipkin.currentAnimation,
     theme: updatedBlipkin.theme,
     lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
     createdAt: updatedBlipkin.createdAt.toISOString(),
     updatedAt: updatedBlipkin.updatedAt.toISOString(),
     missedYou,
+    canEvolve: evolutionCheck.shouldEvolve,
   } satisfies GetBlipkinResponse);
 });
 
@@ -100,12 +137,16 @@ blipkinRouter.post("/", zValidator("json", createBlipkinRequestSchema), async (c
       name,
       level: 1,
       xp: 0,
+      evolutionStage: "baby",
       mood: "Happy",
       energy: 80,
       hunger: 30,
+      cleanliness: 100,
       bond: 50,
+      currentAnimation: "idle",
       theme: "classic",
       lastSeenAt: new Date(),
+      lastStatUpdate: new Date(),
     },
   });
 
@@ -114,10 +155,14 @@ blipkinRouter.post("/", zValidator("json", createBlipkinRequestSchema), async (c
     name: blipkin.name,
     level: blipkin.level,
     xp: blipkin.xp,
+    evolutionStage: blipkin.evolutionStage,
+    megaForm: blipkin.megaForm,
     mood: blipkin.mood,
     energy: blipkin.energy,
     hunger: blipkin.hunger,
+    cleanliness: blipkin.cleanliness,
     bond: blipkin.bond,
+    currentAnimation: blipkin.currentAnimation,
     theme: blipkin.theme,
     lastSeenAt: blipkin.lastSeenAt.toISOString(),
     createdAt: blipkin.createdAt.toISOString(),
@@ -146,10 +191,14 @@ blipkinRouter.put("/", zValidator("json", updateBlipkinRequestSchema), async (c)
     name: blipkin.name,
     level: blipkin.level,
     xp: blipkin.xp,
+    evolutionStage: blipkin.evolutionStage,
+    megaForm: blipkin.megaForm,
     mood: blipkin.mood,
     energy: blipkin.energy,
     hunger: blipkin.hunger,
+    cleanliness: blipkin.cleanliness,
     bond: blipkin.bond,
+    currentAnimation: blipkin.currentAnimation,
     theme: blipkin.theme,
     lastSeenAt: blipkin.lastSeenAt.toISOString(),
     createdAt: blipkin.createdAt.toISOString(),
@@ -166,13 +215,16 @@ blipkinRouter.post("/feed", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const blipkin = await db.blipkin.findUnique({
+  let blipkin = await db.blipkin.findUnique({
     where: { userId: user.id },
   });
 
   if (!blipkin) {
     return c.json({ message: "Blipkin not found" }, 404);
   }
+
+  // Apply stat degradation first
+  blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
 
   // Calculate new stats
   const xpGained = 5;
@@ -182,18 +234,24 @@ blipkinRouter.post("/feed", async (c) => {
   const newXP = blipkin.xp + xpGained;
 
   // Check for level up
-  let newLevel = blipkin.level;
-  let leveledUp = false;
-  let xpAfterLevel = newXP;
+  const levelUpResult = calculateLevelUp(blipkin.level, newXP);
 
-  while (xpAfterLevel >= xpForLevel(newLevel)) {
-    xpAfterLevel -= xpForLevel(newLevel);
-    newLevel++;
-    leveledUp = true;
+  // Recalculate mood and animation
+  const newMood = calculateMood({ ...blipkin, hunger: newHunger, bond: newBond });
+  const newAnimation = levelUpResult.didLevelUp ? "happy" : calculateAnimation(newMood);
+
+  // Check for evolution
+  let evolutionData: any = {};
+  if (levelUpResult.didLevelUp) {
+    const evolutionCheck = checkForEvolution({ ...blipkin, level: levelUpResult.newLevel });
+    if (evolutionCheck.shouldEvolve) {
+      evolutionData = {
+        evolutionStage: evolutionCheck.newStage,
+        megaForm: evolutionCheck.newMegaForm,
+        currentAnimation: "evolving",
+      };
+    }
   }
-
-  // Recalculate mood
-  const newMood = calculateMood(newHunger, blipkin.energy, newBond);
 
   // Update database
   const updatedBlipkin = await db.blipkin.update({
@@ -201,10 +259,13 @@ blipkinRouter.post("/feed", async (c) => {
     data: {
       hunger: newHunger,
       bond: newBond,
-      xp: xpAfterLevel,
-      level: newLevel,
+      xp: levelUpResult.remainingXP,
+      level: levelUpResult.newLevel,
       mood: newMood,
+      currentAnimation: newAnimation,
+      totalFeeds: blipkin.totalFeeds + 1,
       lastSeenAt: new Date(),
+      ...evolutionData,
     },
   });
 
@@ -223,10 +284,14 @@ blipkinRouter.post("/feed", async (c) => {
       name: updatedBlipkin.name,
       level: updatedBlipkin.level,
       xp: updatedBlipkin.xp,
+      evolutionStage: updatedBlipkin.evolutionStage,
+      megaForm: updatedBlipkin.megaForm,
       mood: updatedBlipkin.mood,
       energy: updatedBlipkin.energy,
       hunger: updatedBlipkin.hunger,
+      cleanliness: updatedBlipkin.cleanliness,
       bond: updatedBlipkin.bond,
+      currentAnimation: updatedBlipkin.currentAnimation,
       theme: updatedBlipkin.theme,
       lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
       createdAt: updatedBlipkin.createdAt.toISOString(),
@@ -234,7 +299,8 @@ blipkinRouter.post("/feed", async (c) => {
     },
     xpGained,
     bondGained,
-    leveledUp,
+    leveledUp: levelUpResult.didLevelUp,
+    evolved: evolutionData.evolutionStage !== undefined,
     message,
   } satisfies FeedBlipkinResponse);
 });
@@ -248,7 +314,7 @@ blipkinRouter.post("/play", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const blipkin = await db.blipkin.findUnique({
+  let blipkin = await db.blipkin.findUnique({
     where: { userId: user.id },
   });
 
@@ -256,26 +322,36 @@ blipkinRouter.post("/play", async (c) => {
     return c.json({ message: "Blipkin not found" }, 404);
   }
 
+  // Apply stat degradation first
+  blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
+
   // Calculate new stats
   const xpGained = 8;
   const bondGained = 5;
   const newEnergy = Math.max(0, blipkin.energy - 10);
   const newBond = Math.min(100, blipkin.bond + bondGained);
   const newXP = blipkin.xp + xpGained;
+  const newCleanliness = Math.max(0, blipkin.cleanliness - 5); // Playing makes them dirty
 
   // Check for level up
-  let newLevel = blipkin.level;
-  let leveledUp = false;
-  let xpAfterLevel = newXP;
+  const levelUpResult = calculateLevelUp(blipkin.level, newXP);
 
-  while (xpAfterLevel >= xpForLevel(newLevel)) {
-    xpAfterLevel -= xpForLevel(newLevel);
-    newLevel++;
-    leveledUp = true;
+  // Recalculate mood and animation
+  const newMood = calculateMood({ ...blipkin, energy: newEnergy, bond: newBond, cleanliness: newCleanliness });
+  const newAnimation = levelUpResult.didLevelUp ? "happy" : "excited";
+
+  // Check for evolution
+  let evolutionData: any = {};
+  if (levelUpResult.didLevelUp) {
+    const evolutionCheck = checkForEvolution({ ...blipkin, level: levelUpResult.newLevel });
+    if (evolutionCheck.shouldEvolve) {
+      evolutionData = {
+        evolutionStage: evolutionCheck.newStage,
+        megaForm: evolutionCheck.newMegaForm,
+        currentAnimation: "evolving",
+      };
+    }
   }
-
-  // Recalculate mood
-  const newMood = calculateMood(blipkin.hunger, newEnergy, newBond);
 
   // Update database
   const updatedBlipkin = await db.blipkin.update({
@@ -283,10 +359,14 @@ blipkinRouter.post("/play", async (c) => {
     data: {
       energy: newEnergy,
       bond: newBond,
-      xp: xpAfterLevel,
-      level: newLevel,
+      cleanliness: newCleanliness,
+      xp: levelUpResult.remainingXP,
+      level: levelUpResult.newLevel,
       mood: newMood,
+      currentAnimation: newAnimation,
+      totalPlays: blipkin.totalPlays + 1,
       lastSeenAt: new Date(),
+      ...evolutionData,
     },
   });
 
@@ -305,10 +385,14 @@ blipkinRouter.post("/play", async (c) => {
       name: updatedBlipkin.name,
       level: updatedBlipkin.level,
       xp: updatedBlipkin.xp,
+      evolutionStage: updatedBlipkin.evolutionStage,
+      megaForm: updatedBlipkin.megaForm,
       mood: updatedBlipkin.mood,
       energy: updatedBlipkin.energy,
       hunger: updatedBlipkin.hunger,
+      cleanliness: updatedBlipkin.cleanliness,
       bond: updatedBlipkin.bond,
+      currentAnimation: updatedBlipkin.currentAnimation,
       theme: updatedBlipkin.theme,
       lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
       createdAt: updatedBlipkin.createdAt.toISOString(),
@@ -316,9 +400,208 @@ blipkinRouter.post("/play", async (c) => {
     },
     xpGained,
     bondGained,
-    leveledUp,
+    leveledUp: levelUpResult.didLevelUp,
+    evolved: evolutionData.evolutionStage !== undefined,
     message,
   } satisfies PlayBlipkinResponse);
+});
+
+// ============================================
+// POST /api/blipkin/clean - Clean Blipkin
+// ============================================
+blipkinRouter.post("/clean", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  let blipkin = await db.blipkin.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!blipkin) {
+    return c.json({ message: "Blipkin not found" }, 404);
+  }
+
+  // Apply stat degradation first
+  blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
+
+  // Calculate new stats
+  const xpGained = 3;
+  const bondGained = 2;
+  const newCleanliness = Math.min(100, blipkin.cleanliness + 30);
+  const newBond = Math.min(100, blipkin.bond + bondGained);
+  const newXP = blipkin.xp + xpGained;
+
+  // Check for level up
+  const levelUpResult = calculateLevelUp(blipkin.level, newXP);
+
+  // Recalculate mood and animation
+  const newMood = calculateMood({ ...blipkin, cleanliness: newCleanliness, bond: newBond });
+  const newAnimation = levelUpResult.didLevelUp ? "happy" : calculateAnimation(newMood);
+
+  // Check for evolution
+  let evolutionData: any = {};
+  if (levelUpResult.didLevelUp) {
+    const evolutionCheck = checkForEvolution({ ...blipkin, level: levelUpResult.newLevel });
+    if (evolutionCheck.shouldEvolve) {
+      evolutionData = {
+        evolutionStage: evolutionCheck.newStage,
+        megaForm: evolutionCheck.newMegaForm,
+        currentAnimation: "evolving",
+      };
+    }
+  }
+
+  // Update database
+  const updatedBlipkin = await db.blipkin.update({
+    where: { userId: user.id },
+    data: {
+      cleanliness: newCleanliness,
+      bond: newBond,
+      xp: levelUpResult.remainingXP,
+      level: levelUpResult.newLevel,
+      mood: newMood,
+      currentAnimation: newAnimation,
+      totalCleans: blipkin.totalCleans + 1,
+      lastSeenAt: new Date(),
+      ...evolutionData,
+    },
+  });
+
+  // Generate message
+  let message = "All sparkly clean! ✨";
+  if (newCleanliness === 100) {
+    message = "I feel so fresh and clean! Thank you!";
+  } else if (blipkin.cleanliness < 30) {
+    message = "Finally! I really needed that wash!";
+  }
+
+  return c.json({
+    success: true,
+    blipkin: {
+      id: updatedBlipkin.id,
+      name: updatedBlipkin.name,
+      level: updatedBlipkin.level,
+      xp: updatedBlipkin.xp,
+      evolutionStage: updatedBlipkin.evolutionStage,
+      megaForm: updatedBlipkin.megaForm,
+      mood: updatedBlipkin.mood,
+      energy: updatedBlipkin.energy,
+      hunger: updatedBlipkin.hunger,
+      cleanliness: updatedBlipkin.cleanliness,
+      bond: updatedBlipkin.bond,
+      currentAnimation: updatedBlipkin.currentAnimation,
+      theme: updatedBlipkin.theme,
+      lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
+      createdAt: updatedBlipkin.createdAt.toISOString(),
+      updatedAt: updatedBlipkin.updatedAt.toISOString(),
+    },
+    xpGained,
+    bondGained,
+    leveledUp: levelUpResult.didLevelUp,
+    evolved: evolutionData.evolutionStage !== undefined,
+    message,
+  } satisfies CleanBlipkinResponse);
+});
+
+// ============================================
+// POST /api/blipkin/rest - Rest Blipkin
+// ============================================
+blipkinRouter.post("/rest", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  let blipkin = await db.blipkin.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!blipkin) {
+    return c.json({ message: "Blipkin not found" }, 404);
+  }
+
+  // Apply stat degradation first
+  blipkin = await applyStatDegradation(blipkin.id, user.id) || blipkin;
+
+  // Calculate new stats
+  const xpGained = 3;
+  const bondGained = 2;
+  const newEnergy = Math.min(100, blipkin.energy + 30);
+  const newBond = Math.min(100, blipkin.bond + bondGained);
+  const newXP = blipkin.xp + xpGained;
+
+  // Check for level up
+  const levelUpResult = calculateLevelUp(blipkin.level, newXP);
+
+  // Recalculate mood and animation
+  const newMood = calculateMood({ ...blipkin, energy: newEnergy, bond: newBond });
+  const newAnimation = "sleep";
+
+  // Check for evolution
+  let evolutionData: any = {};
+  if (levelUpResult.didLevelUp) {
+    const evolutionCheck = checkForEvolution({ ...blipkin, level: levelUpResult.newLevel });
+    if (evolutionCheck.shouldEvolve) {
+      evolutionData = {
+        evolutionStage: evolutionCheck.newStage,
+        megaForm: evolutionCheck.newMegaForm,
+        currentAnimation: "evolving",
+      };
+    }
+  }
+
+  // Update database
+  const updatedBlipkin = await db.blipkin.update({
+    where: { userId: user.id },
+    data: {
+      energy: newEnergy,
+      bond: newBond,
+      xp: levelUpResult.remainingXP,
+      level: levelUpResult.newLevel,
+      mood: newMood,
+      currentAnimation: newAnimation,
+      totalRests: blipkin.totalRests + 1,
+      lastSeenAt: new Date(),
+      ...evolutionData,
+    },
+  });
+
+  // Generate message
+  let message = "Zzz... that was a nice nap!";
+  if (newEnergy === 100) {
+    message = "I'm fully recharged! Let's go!";
+  } else if (blipkin.energy < 20) {
+    message = "Finally... I can rest... zzz";
+  }
+
+  return c.json({
+    success: true,
+    blipkin: {
+      id: updatedBlipkin.id,
+      name: updatedBlipkin.name,
+      level: updatedBlipkin.level,
+      xp: updatedBlipkin.xp,
+      evolutionStage: updatedBlipkin.evolutionStage,
+      megaForm: updatedBlipkin.megaForm,
+      mood: updatedBlipkin.mood,
+      energy: updatedBlipkin.energy,
+      hunger: updatedBlipkin.hunger,
+      cleanliness: updatedBlipkin.cleanliness,
+      bond: updatedBlipkin.bond,
+      currentAnimation: updatedBlipkin.currentAnimation,
+      theme: updatedBlipkin.theme,
+      lastSeenAt: updatedBlipkin.lastSeenAt.toISOString(),
+      createdAt: updatedBlipkin.createdAt.toISOString(),
+      updatedAt: updatedBlipkin.updatedAt.toISOString(),
+    },
+    xpGained,
+    bondGained,
+    leveledUp: levelUpResult.didLevelUp,
+    evolved: evolutionData.evolutionStage !== undefined,
+    message,
+  } satisfies RestBlipkinResponse);
 });
 
 export { blipkinRouter };
