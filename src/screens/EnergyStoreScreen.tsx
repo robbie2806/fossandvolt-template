@@ -204,7 +204,8 @@ const EnergyStoreScreen = ({ navigation, route }: Props) => {
         <View className="gap-4">
           {ENERGY_PACKAGES.map((pkg) => {
             const rcPackage = packages[pkg.lookupKey];
-            const displayPrice = rcPackage?.product.priceString || pkg.price;
+            // For emergency package, always use our price instead of RevenueCat's price
+            const displayPrice = pkg.id === "emergency" ? pkg.price : (rcPackage?.product.priceString || pkg.price);
 
             return (
               <Pressable
