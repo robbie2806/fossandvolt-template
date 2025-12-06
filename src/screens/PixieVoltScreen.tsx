@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,6 +14,29 @@ import type {
 } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"PixieVoltTab">;
+
+// Helper function to get the correct Blipkin image based on evolution stage
+const getBlipkinImage = (evolutionStage: string, megaForm?: string | null) => {
+  if (evolutionStage === "mega" && megaForm) {
+    const megaImages: Record<string, any> = {
+      nurturer: require("@/assets/blipkin-mega-nurturer.png"),
+      explorer: require("@/assets/blipkin-mega-nurturer.png"), // Using nurturer for explorer (you can add explorer later)
+      chaos: require("@/assets/blipkin-mega-chaos.png"),
+      calm: require("@/assets/blipkin-mega-calm.png"),
+    };
+    return megaImages[megaForm] || require("@/assets/blipkin-adult.png");
+  }
+
+  const stageImages: Record<string, any> = {
+    baby: require("@/assets/blipkin-baby.png"),
+    child: require("@/assets/blipkin-child.png"),
+    teen: require("@/assets/blipkin-teen.png"),
+    adult: require("@/assets/blipkin-adult.png"),
+    elder: require("@/assets/blipkin-elder.png"),
+  };
+
+  return stageImages[evolutionStage] || require("@/assets/blipkin-baby.png");
+};
 
 const PixieVoltScreen = ({ navigation }: Props) => {
   const queryClient = useQueryClient();
@@ -123,12 +146,14 @@ const PixieVoltScreen = ({ navigation }: Props) => {
               end={{ x: 1, y: 1 }}
               style={{ padding: 24 }}
             >
-              {/* Blipkin Avatar - Simple orb */}
+              {/* Blipkin Avatar - Pixel Art Image */}
               <View className="items-center mb-6">
-                <View className="bg-white/30 rounded-full p-6 mb-4">
-                  <View className="bg-white/40 rounded-full p-5">
-                    <Sparkles size={64} color="#FFFFFF" strokeWidth={1.5} />
-                  </View>
+                <View className="bg-white/20 rounded-3xl p-6 mb-4">
+                  <Image
+                    source={getBlipkinImage(blipkin.evolutionStage, blipkin.megaForm)}
+                    style={{ width: 120, height: 120 }}
+                    resizeMode="contain"
+                  />
                 </View>
 
                 {/* Name */}
@@ -138,6 +163,15 @@ const PixieVoltScreen = ({ navigation }: Props) => {
                 <Text className="text-white/90 text-lg">
                   {moodEmoji[blipkin.mood] || "✨"} {blipkin.mood} • Level {blipkin.level}
                 </Text>
+
+                {/* Evolution Stage Badge */}
+                <View className="bg-white/20 rounded-full px-4 py-1 mt-2">
+                  <Text className="text-white/90 text-sm font-medium capitalize">
+                    {blipkin.evolutionStage === "mega" && blipkin.megaForm
+                      ? `Mega ${blipkin.megaForm}`
+                      : blipkin.evolutionStage}
+                  </Text>
+                </View>
               </View>
 
               {/* XP Progress Bar */}

@@ -364,6 +364,21 @@ Before distributing to testers, verify:
 
 ## Recent Changes
 
+### Blipkin Pixel Art Evolution Sprites Added! (Dec 6, 2025)
+- **NEW**: Beautiful pixel art sprites for all 6 evolution stages
+- **ASSETS**: Added proper Blipkin images:
+  - `blipkin-baby.png` - Baby stage (green, small)
+  - `blipkin-child.png` - Child stage (cyan, small)
+  - `blipkin-teen.png` - Teen stage (green with AI glow)
+  - `blipkin-adult.png` - Adult stage (cyan cube)
+  - `blipkin-mega-nurturer.png` - Mega Nurturer form (pink/red)
+  - `blipkin-mega-chaos.png` - Mega Chaos form (green glitchy)
+  - `blipkin-mega-calm.png` - Mega Calm form (cyan meditating)
+  - `blipkin-elder.png` - Elder stage (cyan with beard and halo)
+- **UPDATED**: PixieVolt screen now displays actual Blipkin sprites based on evolution stage
+- **FEATURE**: Evolution stage badge shows current stage (e.g., "Baby", "Mega Calm", "Elder")
+- **VISUAL**: Replaced generic sparkle icon with pixel art character display
+
 ### TestFlight Ready Build (Dec 6, 2025)
 - **CONFIGURED**: Complete TestFlight configuration with bundle ID and assets
 - **OPTIMIZED**: Focused on core offline Tamagotchi experience
