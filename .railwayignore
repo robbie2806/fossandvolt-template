@@ -1,0 +1,24 @@
+# Ignore development files
+node_modules
+*.log
+.env
+.env.local
+
+# Ignore frontend files (we only deploy backend)
+app
+assets
+components
+constants
+hooks
+scripts
+app.json
+babel.config.js
+metro.config.js
+tsconfig.json
+tailwind.config.js
+nativewind-env.d.ts
+package.json
+
+# Keep backend files
+!backend/**
+!shared/**

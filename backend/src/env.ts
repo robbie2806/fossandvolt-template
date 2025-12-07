@@ -10,7 +10,7 @@ const envSchema = z.object({
   NODE_ENV: z.string().optional(),
 
   // Database Configuration
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("file:dev.db"),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("file:./prisma/dev.db"),
 
   // Better Auth Configuration
   BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
