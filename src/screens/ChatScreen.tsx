@@ -9,10 +9,11 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Send, Sparkles, ArrowLeft } from "lucide-react-native";
+import { Home, ChevronDown, Eraser, Image as ImageIcon, Volume2, Smartphone, Zap, Cloud, Mic, Sparkles, Send } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type { GetChatHistoryResponse, GetCompanionResponse, GetBlipkinResponse, SendChatMessageResponse } from "@/shared/contracts";
