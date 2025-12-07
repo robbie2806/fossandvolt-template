@@ -3,7 +3,7 @@ nixPkgs = ["bun"]
 
 [phases.install]
 cmds = [
-  "cd backend && cp prisma/schema.production.prisma prisma/schema.prisma",
+  "cp backend/prisma/schema.production.prisma backend/prisma/schema.prisma",
   "cd backend && bun install"
 ]
 
