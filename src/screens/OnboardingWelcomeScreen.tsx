@@ -19,9 +19,9 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
 
       async function checkAuthStatus() {
         try {
-          // Set a 5 second timeout for the entire check
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Auth check timeout')), 5000)
+          // Set a 3 second timeout for the entire check
+          const timeoutPromise = new Promise<void>((_, reject) =>
+            setTimeout(() => reject(new Error('Auth check timeout')), 3000)
           );
 
           const checkPromise = (async () => {
@@ -79,7 +79,12 @@ const OnboardingWelcomeScreen = ({ navigation }: Props) => {
 
           await Promise.race([checkPromise, timeoutPromise]);
         } catch (error) {
-          console.error("[OnboardingWelcome] Auth check failed:", error);
+          // Use console.log instead of console.error for timeouts (they're expected)
+          if (error instanceof Error && error.message === 'Auth check timeout') {
+            console.log("[OnboardingWelcome] Auth check timed out, showing welcome screen");
+          } else {
+            console.log("[OnboardingWelcome] Auth check failed:", error);
+          }
           // On error or timeout, show the welcome screen anyway
         } finally {
           if (isActive) {
